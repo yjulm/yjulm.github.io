@@ -1,0 +1,713 @@
+<html lang="zh">
+<head>
+    <meta charset="utf-8" />
+<meta name="description" content="" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+<title>显示器与触摸屏的一对一绑定原理和解析 | Yjulm</title>
+
+<link rel="shortcut icon" href="https://yjulm.com/favicon.ico?v=1670599107006">
+
+<link href="https://fastly.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://yjulm.com/styles/main.css">
+
+<!-- <link rel="stylesheet" href="https://fastly.jsdelivr.net/npm/bootstrap@4.5.0/dist/css/bootstrap.min.css"> -->
+<!-- <script src="https://fastly.jsdelivr.net/npm/moment@2.27.0/moment.min.js"></script> -->
+<!-- <script src="https://fastly.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js"></script> -->
+<!-- <script src="https://fastly.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"></script> -->
+<!-- <script src="https://fastly.jsdelivr.net/npm/bootstrap@4.5.0/dist/js/bootstrap.min.js"></script> -->
+<!-- DEMO JS -->
+<!--<script src="media/scripts/index.js"></script>-->
+
+
+
+    
+<link rel="stylesheet" href="https://fastly.jsdelivr.net/gh/highlightjs/cdn-release@11.3.1/build/styles/base16/solarized-light.min.css">
+
+<script src="https://fastly.jsdelivr.net/combine/gh/highlightjs/cdn-release@11.3.1/build/highlight.min.js,gh/highlightjs/cdn-release@11.3.1/build/languages/cpp.min.js,gh/highlightjs/cdn-release@11.3.1/build/languages/csharp.min.js,gh/highlightjs/cdn-release@11.3.1/build/languages/c.min.js,gh/highlightjs/cdn-release@11.3.1/build/languages/python.min.js,gh/highlightjs/cdn-release@11.3.1/build/languages/rust.min.js,gh/highlightjs/cdn-release@11.3.1/build/languages/xml.min.js,gh/highlightjs/cdn-release@11.3.1/build/languages/javascript.min.js,gh/highlightjs/cdn-release@11.3.1/build/languages/powershell.min.js,gh/highlightjs/cdn-release@11.3.1/build/languages/shell.min.js,gh/highlightjs/cdn-release@11.3.1/build/languages/sql.min.js,gh/highlightjs/cdn-release@11.3.1/build/languages/http.min.js,gh/highlightjs/cdn-release@11.3.1/build/languages/go.min.js,gh/highlightjs/cdn-release@11.3.1/build/languages/css.min.js"></script>
+
+<!-- <script src="https://fastly.jsdelivr.net/gh/highlightjs/cdn-release@11.3.1/build/highlight.min.js"></script>
+<script src="https://fastly.jsdelivr.net/gh/highlightjs/cdn-release@11.3.1/build/languages/cpp.min.js"></script>
+<script src="https://fastly.jsdelivr.net/gh/highlightjs/cdn-release@11.3.1/build/languages/csharp.min.js"></script>
+<script src="https://fastly.jsdelivr.net/gh/highlightjs/cdn-release@11.3.1/build/languages/c.min.js"></script>
+<script src="https://fastly.jsdelivr.net/gh/highlightjs/cdn-release@11.3.1/build/languages/python.min.js"></script>
+<script src="https://fastly.jsdelivr.net/gh/highlightjs/cdn-release@11.3.1/build/languages/rust.min.js"></script>
+<script src="https://fastly.jsdelivr.net/gh/highlightjs/cdn-release@11.3.1/build/languages/xml.min.js"></script>
+<script src="https://fastly.jsdelivr.net/gh/highlightjs/cdn-release@11.3.1/build/languages/javascript.min.js"></script>
+<script src="https://fastly.jsdelivr.net/gh/highlightjs/cdn-release@11.3.1/build/languages/powershell.min.js"></script>
+<script src="https://fastly.jsdelivr.net/gh/highlightjs/cdn-release@11.3.1/build/languages/shell.min.js"></script>
+<script src="https://fastly.jsdelivr.net/gh/highlightjs/cdn-release@11.3.1/build/languages/sql.min.js"></script>
+<script src="https://fastly.jsdelivr.net/gh/highlightjs/cdn-release@11.3.1/build/languages/http.min.js"></script>
+<script src="https://fastly.jsdelivr.net/gh/highlightjs/cdn-release@11.3.1/build/languages/go.min.js"></script>
+<script src="https://fastly.jsdelivr.net/gh/highlightjs/cdn-release@11.3.1/build/languages/css.min.js"></script>
+ -->
+
+    <script src="https://fastly.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+<script>mermaid.initialize({startOnLoad:true});</script>
+
+    <link rel="stylesheet" href="https://fastly.jsdelivr.net/npm/viewerjs@1.10.2/dist/viewer.min.css" />
+<script src="https://fastly.jsdelivr.net/npm/viewerjs@1.10.2/dist/viewer.min.js"></script>
+
+    <link rel="stylesheet" href="https://fastly.jsdelivr.net/npm/katex@0.16.4/dist/katex.min.css">
+    <script src="https://fastly.jsdelivr.net/npm/katex@0.16.4/dist/katex.min.js"></script>
+    <script src="https://fastly.jsdelivr.net/npm/katex@0.16.4/dist/contrib/auto-render.min.js"></script>
+</head>
+<body>
+<div class="main gt-bg-theme-color-first">
+    <nav class="navbar navbar-expand-lg">
+    <a class="navbar-brand" href="/">
+        <img class="user-avatar" src="/images/avatar.png" alt="头像">
+        <div class="site-name gt-c-content-color-first">
+            Yjulm
+        </div>
+    </a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+        aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation" id="changeNavbar">
+        <i class="fas fa-bars gt-c-content-color-first" style="font-size: 18px"></i>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <div class="navbar-nav mr-auto" style="text-align: center">
+            
+            <div class="nav-item">
+                
+                <a href="/" class="menu gt-a-link">
+                    首页
+                </a>
+                
+            </div>
+            
+            <div class="nav-item">
+                
+                <a href="/archives" class="menu gt-a-link">
+                    归档
+                </a>
+                
+            </div>
+            
+            <div class="nav-item">
+                
+                <a href="/tags" class="menu gt-a-link">
+                    标签
+                </a>
+                
+            </div>
+            
+            <div class="nav-item">
+                
+                <a href="/post/about" class="menu gt-a-link">
+                    关于
+                </a>
+                
+            </div>
+            
+        </div>
+        <div style="text-align: center">
+            <form id="gridea-search-form" style="position: relative" data-update="1670599107006"
+                action="/search/">
+                <input class="search-input" autocomplete="off" spellcheck="false" name="q" placeholder="搜索文章" />
+                <i class="fas fa-search gt-c-content-color-first" style="position: absolute; top: 9px; left: 10px;"></i>
+            </form>
+        </div>
+    </div>
+</nav>
+<script>
+    /* 移动端导航栏展开/收起切换 */
+    document.getElementById('changeNavbar').onclick = function () {
+        var element = document.getElementById('navbarSupportedContent');
+        if (element.style.display === 'none' || element.style.display === '') {
+            element.style.display = 'block';
+        } else {
+            element.style.display = 'none';
+        }
+    }
+</script>
+
+    <div class="post-container">
+        <div class="post-detail gt-bg-theme-color-second">
+            <article class="gt-post-content">
+                <h2 class="post-title">
+                    显示器与触摸屏的一对一绑定原理和解析
+                </h2>
+                <div class="post-info">
+                    <time class="post-time gt-c-content-color-first">
+                        · 2021-11-20 ·
+                    </time>
+                    
+                        <a href="https://yjulm.com/tag/window/" class="post-tags">
+                            # Window
+                        </a>
+                    
+                        <a href="https://yjulm.com/tag/usb-hid/" class="post-tags">
+                            # USB-HID
+                        </a>
+                    
+                        <a href="https://yjulm.com/tag/ida-pro/" class="post-tags">
+                            # IDA Pro
+                        </a>
+                    
+                        <a href="https://yjulm.com/tag/touch/" class="post-tags">
+                            # Touch
+                        </a>
+                    
+                        <a href="https://yjulm.com/tag/screen/" class="post-tags">
+                            # Screen
+                        </a>
+                    
+                </div>
+                <div class="post-content">
+                    <p>  在平常的系统使用场景中几乎很少会使用触摸屏，来尝试解决这个问题的人也从来没有，则我成了这第一个吃螃蟹的人。问题起因是遇到了这样一个特殊的场景，在大量的工控主板中设计中，工控厂商一般会在 <strong>BIOS</strong> 中开启一个  <strong>LVDS</strong> 监视器端口。但是在主板硬件中处并没有引出该硬件接口，此时在同时接入 <strong>HDMI</strong> 和 <strong>VGA</strong> 两块显示器的时候，在系统中却显示的有三个屏幕。</p>
+<p>  这原本看起来本没什么问题，当我们接入 <strong>HDMI</strong> 显示器是<strong>带有触摸</strong>的，并在系统设置中将其设置为主显示器时，问题就会出现在开机的时候。在主机先执行开机的情况下，这些显示器并没有接入电源时，待系统差不多完成开机这个时候给屏幕接入电源，则系统会随机出现  <strong>HDMI</strong> 与  <strong>VGA</strong> 的显示颠倒，同时 <strong>HDMI</strong> 自带的触摸屏幕也随机出现颠倒，将我们的触摸操作执行在了 <strong>VGA</strong> 的显示器中。这在一个不使用鼠标作为操作交互的产品中，问题就显得非常严重了。当触摸操作响应在 <strong>VGA</strong> 显示器中时，而你却是在 <strong>HDMI</strong> 上操作。不使用鼠标的情况下，这种状态是完全无法正常使用操作系统的。那么如何在不重启系统的情况下矫正触摸，则成了棘手的问题。</p>
+<h1 id="一-系统自带的矫正工具">一、 系统自带的矫正工具</h1>
+<p>  这个问题微软或许自己就知道，提前准备了这样一个矫正功能，但要调用这个功能却层层复杂。它处在 <strong>控制面板</strong> --&gt; <strong>平板电脑设置</strong> --&gt; <strong>设置</strong> 这样一个操作流程中。这在一个没有鼠标且又触摸颠倒的系统状况下，这成了几乎不可能达成的操作，最重要的是大多数人并不知道有这么一个矫正工具。<br>
+<img src="https://yjulm.com/post-images/1637401345215.png" alt="" loading="lazy"></p>
+<center>图 1-1 触摸矫正工具</center>
+<p>  那如何用代码实现一个能开机自启动并自定矫正的工具，这问题的关键就成了怎样编程才能矫正触摸。但即便是翻遍了 <strong>MSDN</strong> 上所有有关触摸屏幕的文档后，你依旧不能找到任何线索。眼角默默流出忧伤泪水的你，必须接受微软没有开放这一接口的设定！</p>
+<p>  微软没有开放触摸相关的接口，那么微软自己的工具为啥能矫正，这就是突破口！通过打开这个矫正工具并借助任务管理器的显示命令行功能，我们可以知道该工具的路径和调用参数如下：<br>
+<img src="https://yjulm.com/post-images/1637402245694.png" alt="" loading="lazy"></p>
+<center>图 1-2 任务管理器的可用信息</center>
+<p>  通过简单使用该工具可知道它的工作逻辑是，将所有屏幕上显示白屏窗口。让用户使用  <kbd>Enter</kbd> 键来移动提示语到需要设置的屏幕中，再让用户触碰触屏。通过这两个操作来同时确定用户选择的显示器和触摸屏，然后系统底层将这两者信息绑定在一起并应用该设置。</p>
+<p>  光知道工作逻辑并没实际用途，还需要知道矫正操作的详细细节。该系统程序为 <strong>C++</strong> 语言开发，此时则需要借助静态分析工具 <strong><a href="https://hex-rays.com/ida-pro/">IDA Pro</a></strong> 来帮助我们了解详细过程。经过 <strong>IDA Pro</strong> 的简单反汇编，并通过任务管理器中提取的启动参数 <code>-touch</code> 我们可以快速在主函数中定位到以下细节：<br>
+<img src="https://yjulm.com/post-images/1637548637138.png" alt="" loading="lazy"></p>
+<center>图 1-3 主函数</center>
+<p>  由图可知代码将在 <strong>115</strong> 行位置开始进入映射流程。该程序同时承担了触摸屏和电磁笔的矫正功能，则通过启动参数 <code>-touch</code> 和 <code>-pen</code> 来分辨设定并标记到 <strong>v13</strong> ，在启动映射流程时将其传递给 <code>StartMapping</code> 。<br>
+<img src="https://yjulm.com/post-images/1637549445226.png" alt="" loading="lazy"></p>
+<center>图 1-4 StartMapping 的准备工作</center>
+<p>  在 <strong>StartMapping</strong> 中的 <strong>20-21</strong> 行位置处，通过观察其名称与其内部调用的系统API函数 <code>EnumDisplayMonitors</code> ，<code>EnumDisplayDevicesW</code> ， <code>GetPointerDevices</code> 可大致推断，这两个函数的本质是取出 <strong>监视器</strong> 和  <strong>触点设备（Touch 与 Pen）</strong> 的基础信息。目的是为了后面的 <strong>窗口事件循环</strong> 处理函数 <code>MDMWndProc</code> 做准备，正如程序的使用逻辑那样，让用户选择屏幕和触碰屏来达到确认设备的目的，这都是前期准备工作。下面的流程将进入 <code>MDMWndProc</code> 。<br>
+<img src="https://yjulm.com/post-images/1637553243231.png" alt="" loading="lazy"></p>
+<center>图 1-5 窗口消息循环</center>
+<p>  在 <code>MDMWndProc</code> 中检测触点抬起消息 <code>WM_POINTERUP</code>，并在此 <code>PointerProc</code> 中使用API <code>GetPointerInfo</code> 取得触摸的信息。使用内置消息 <code>WM_APP + 2</code> 触发 <code>WriteDigitizerMonitorAssociations</code> 写入触摸和屏幕的映射数据，待写入映射后再配合 <code>BroadcastSettingChange</code>  通知系统发生了映射变更。自此关键操作就完成了。这两个函数是实现校准的重点。下面将流程转入 <code>WriteDigitizerMonitorAssociations</code> 函数中。<br>
+<img src="https://yjulm.com/post-images/1637564607416.png" alt="" loading="lazy"></p>
+<center> 图 1-6 写入映射信息</center>
+<p>  在 <strong>84</strong> 行位置使用了 <code>RegDeleteKeyValueW</code> 来删除了一个注册表值，我们依据此路径可在注册表中找到一个如下的键值对：<br>
+<img src="https://yjulm.com/post-images/1637565143149.png" alt="" loading="lazy"></p>
+<center> 图 1-7 映射信息</center>
+<p>从图 1-7 中我们可知道该 <strong>Key</strong> 正如图 1-6 中 <strong>78</strong> 行那样，将触摸设备的硬件路径格式化为一个带有<code>20-</code> 前缀的字符，并使用监视器硬件路径作为 <strong>Value</strong> ，以此构建一个映射键值对。现在将视线返回到图 1-6 中。在移除键值后的 <strong>88</strong> 行处跳转到 <strong>92</strong> 行继续往下执行，在对删除操作做错误检测后使用 <code>AssociationAdd</code> 将新的键值写会到注册表，该函数其主要行为就是构建前面的 <strong>Key</strong> 与 <strong>Value</strong> 并将其写入到删除的注册表位置，具体细节就不在此处详细展开。</p>
+<p>  这里需要说明的是，在 <code>AssociationAdd</code> 写入新的设备键值对以后的 <strong>96</strong> 行的 <code>SetDisplayMapping</code> 是 Win8/Win10特有的操作，在Win7系统是不存在这个这个操作的。该函数将在后面第二节详细说明。</p>
+<h2 id="1-写入注册表的注意事项">1、 写入注册表的注意事项</h2>
+<p>  对键值的写入操作有一个重要信息，该键值的路径已经显示了其属于系统层，对其读写操作有权限要求。解决办法有如下方式：</p>
+<ul>
+<li>使用管理员权限运行程序，由此通过权限检查，但需要用户手动确认UAC弹窗。</li>
+<li>使用一个 <strong><a href="https://docs.microsoft.com/en-us/windows/win32/services/localsystem-account">LocalSystem</a></strong> 权限组的服务程序代为执行该操作，也可通过权限检查。其原因是 <strong>MACHINE\SOFTWARE\Microsoft\Wisp</strong> 路径对 &quot;<strong>NT AUTHORITY\SYSTEM</strong>&quot; 开放 <strong>FullControl</strong>，而 <strong>LocalSystem</strong> 组的服务程序则默认拥有 &quot;<strong>NT AUTHORITY\SYSTEM</strong>&quot; 账户权。有关此具体信息可参阅微软官方文档“<a href="https://docs.microsoft.com/en-us/windows/win32/secauthz/developing-applications-that-require-administrator-privilege">开发需要管理员权限的应用程序</a>”了解其开发细节。</li>
+</ul>
+<p>  在没有执行过矫正的系统注册表路径下 <code>HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Wisp\Pen</code> 是不存在子键 <strong>Digimon</strong> 的，这需要自己手动新建。</p>
+<p>  在64位系统中且程序是32位时，Windows的 <a href="https://docs.microsoft.com/en-us/windows/win32/winprog64/registry-redirector">路径重定向</a> 会导致导致修改成功却没有任何变化。大多数人可能会首先想到使用 <code>Wow64DisableWow64FsRedirection</code> 来禁用重定向功能，但非常遗憾的是该函数仅对文件系统路径有效。因此在新建 <code>RegCreateKeyEx</code> 或者 <code>RegOpenKeyEx</code> 打开该子项时，需要使用 <strong><code>KEY_WOW64_64KEY </code></strong> 权限来操作。有关详细信息请参阅文档 <a href="https://docs.microsoft.com/en-us/windows/win32/winprog64/registry-redirector">Registry Redirector</a> 与 <a href="https://docs.microsoft.com/en-us/windows/win32/sysinfo/registry-key-security-and-access-rights">Registry Key Security and Access Rights</a> 了解更多信息。针对以上的问题我们可以写出如下的辅助函数：</p>
+<pre><code class="language-c++">typedef BOOL (WINAPI *IsWow64FuncPtr) ( _In_ HANDLE hProcess, _Out_ PBOOL Wow64Process );
+
+bool IsWow64()
+{
+    int ret{};
+    const auto proc = reinterpret_cast&lt;IsWow64FuncPtr&gt;(
+        GetProcAddress(GetModuleHandle(TEXT(&quot;kernel32&quot;)), &quot;IsWow64Process&quot;));
+    return proc &amp;&amp; proc(GetCurrentProcess(), &amp;ret) &amp;&amp; ret;
+}
+
+/*
+* RegOpenKeyEx 在打开注册表键失败时（没有访问权），如果是管理员（管理员组内账户），
+* 则可以启用 SE_TAKE_OWNERSHIP_NAME特权，并使用 WRITE_OWNER 权限打开
+* document : https://docs.microsoft.com/zh-cn/windows/win32/sysinfo/registry-key-security-and-access-rights
+*/
+HKEY OpenRegKey(HKEY hKey, const wchar_t *subKey, bool owner, bool createNew, bool &amp;isCreate)
+{
+    HKEY retKey{};
+    if (hKey)
+    {
+        DWORD code{};
+        REGSAM sam = KEY_READ | KEY_WRITE
+            | (IsWow64() ? KEY_WOW64_64KEY : 0) //指示系统当前操作在 64 位注册表中
+            | (owner ? WRITE_OWNER : 0);
+
+        if ((code = RegOpenKeyEx(hKey, subKey, 0, sam, &amp;retKey)) == ERROR_SUCCESS)
+            isCreate = false;
+        else
+        {
+            if (createNew)
+            {
+                if ((code = RegCreateKeyEx(hKey, subKey, 0, nullptr, REG_OPTION_NON_VOLATILE, sam, nullptr, &amp;retKey, nullptr)) == ERROR_SUCCESS)
+                {
+                    isCreate = true;
+                    return retKey;
+                }
+            }
+        }
+    }
+    return retKey;
+}
+</code></pre>
+<p>再对此如下使用即可操作子项 <strong>Digimon</strong> 的键值：</p>
+<pre><code class="language-c++">HKEY retKey{};
+bool isCreate{};
+if ((retKey = OpenRegKey(HKEY_LOCAL_MACHINE, L&quot;SOFTWARE\\Microsoft\\Wisp\\Pen&quot;, false, true, isCreate)) != nullptr)
+{
+	HKEY digimonKey{};
+	if ((digimonKey = OpenRegKey(retKey, L&quot;Digimon&quot;, false, true, isCreate)) != nullptr)
+	{
+        //do something
+	}
+}
+</code></pre>
+<h1 id="二-让系统立即生效的映射通知">二、 让系统立即生效的映射通知</h1>
+<p>  需要说明的是本文逆向过程中的截图均为Win8系统的程序，在早期的Win7中有关映射通知的实现和Win8以及后续系统不同。</p>
+<h2 id="1-win7系统的映射通知">1、 Win7系统的映射通知</h2>
+<p>  Win7的通知操作和后续系统的设计不同，该操作实现在图 1-5 的 <strong>32</strong> 行 <code>BroadcastSettingChange</code> 中。至此Win7系统触摸矫正工作就已经全部完成。<br>
+<img src="https://yjulm.com/post-images/1637571147360.png" alt="" loading="lazy"></p>
+<center>图 1-8 Win7系统的映射通知</center>
+<p>为了便于理解其，此处使用的是64位系统中的程序文件进行反编译操作，其关键代码在 <strong>25</strong> 行处，我们可以简单翻译为如下实现：</p>
+<pre><code class="language-c++">bool BroadcastMappingChange()
+{
+	/*
+	 * SendMessageTimeout 仅适用于桌面程序，在服务程序中使用能调用成功但操作不会成功！
+	 * https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-sendmessagetimeouta#requirements
+	 */
+	DWORD_PTR dwResult;
+	wchar_t msg[]{L&quot;TabletPCDigitizerMappingChanged&quot;};		//该字符串来自于系统触屏校准程序MultiDigiMon.exe 的反编译得到
+	if (SendMessageTimeout(HWND_BROADCAST, WM_SETTINGCHANGE, NULL, LPARAM(msg), SMTO_ABORTIFHUNG, 200, &amp;dwResult))
+		return true;
+	return GetLastError() == ERROR_SUCCESS;
+}
+</code></pre>
+<h2 id="2-win8win10系统的特殊映射通知">2、 Win8/Win10系统的特殊映射通知</h2>
+<p>  Win8以后的系统通知是由图 1-6 中第 <strong>96</strong> 行的 <code>SetDisplayMapping</code> 实施的。现在我们回到图 1-6 并双击函数名称将跳转该函数的定义处：<br>
+<img src="https://yjulm.com/post-images/1637572110234.png" alt="" loading="lazy"></p>
+<center>图 1-9 函数定义</center>
+<p>该函数接受两个参数且使用 <code>__stdcall</code> 调用约定，这里需要提到一点，<strong>IDA Pro</strong> 毕竟是静态反汇编操作，很多时候不要完全相信 <strong>IDA Pro</strong> 的输出代码。在 64 位程序中该函数被提示为使用 <code>__fastcall</code> 的调用约定，这就是为什么同时使用 32 和 64 位程序来分析的原因。</p>
+<p>  不幸的是该函数微软并没有公布任何文档，且该函数在导出时采用了序号导出并没有名字。通过 <strong>IDA Pro</strong> 的导入列表可以知道该函数来自 <strong>User32.dll</strong> 的第 <strong>2532</strong> 号导出位置。经过各种搜索引擎的帮助我们在<strong>看雪论坛</strong>找到了该函数的底层实现名称为 <a href="https://bbs.pediy.com/thread-149861.htm">NtUserSetDisplayMapping</a>，但也仅仅知道名字而已。目前依据已知信息我们可以写出如下 <em><strong>不完整</strong></em> 的函数原型：</p>
+<pre><code class="language-c++">typedef  LONG32(__stdcall *NtUserSetDisplayMapping) (*** param1, *** param2);
+
+void SetDisplayMapping(*** param1, *** param2)
+{
+    LONG32 ret = 0;
+    const auto proc = reinterpret_cast&lt;NtUserSetDisplayMapping&gt;(
+        GetProcAddress(GetModuleHandle(TEXT(&quot;user32&quot;)), MAKEINTRESOURCEA(2532)));
+    if (proc != nullptr)
+        ret = proc(param1, param2);
+}
+</code></pre>
+<p>将视线挪回到图 1-6 中，现仍旧是继续探索这两个参数的含义与类型的过程。沿着参数 <strong>v16</strong> 这个字节数组一路向上层追踪，可弄清 <strong>v16</strong> 是怎么创建出来的。往上寻得 <strong>v16</strong> 就是图 1-4 中第 <strong>16</strong> 行的 <strong>g_context</strong>，整个逆向工程就卡在此处毫无进展。在一段时间毫无进展后放弃了对Win8以上的系统的校准支持，此时的逆向工作停在了2019年10月。</p>
+<p>  时间来到两年后的2021年11月，再次遇到触摸问题得以抽空继续看看。这次换个思路，在经过同时使用 32 位和 64 位，以及将两组程序分为加载调试符号和不加载调试这样4种的反编译处理后，尝试沿着参数一直往上层追踪。进过大量测试发现这两个值在不重启系统情况下每次调试都不变，当屏幕或者触摸屏幕硬件拔插后会发生变化时，或重启系统后也会变化。通过对这两参数内存周围数据的查看时，观察第一个参数的内存地址旁边有HID<strong>触摸设备名称</strong>，第二个参数的内存地址旁边有<strong>监视器设备路径</strong>，依据这一特征大胆猜测了这两个参数应该是关于设备信息的数据。<br>
+<img src="https://yjulm.com/post-images/1637584670889.png" alt="" loading="lazy"></p>
+<center>图 1-10 不变的参数值</center>
+<p>  依据设备信息这一线索，经大量调试对比后在以下函数找到了这个不会变化的值，而这数据刚好在 <a href="https://docs.microsoft.com/en-us/windows/win32/api/winuser/ns-winuser-pointer_info">POINTER_INFO</a> 结构类型的 <strong>g_lastPointerInfo</strong> 全局变量，分析该 <code>POINTER_INFO</code> 结构的第五元素位置，确认第一参数其实是触屏的设备句柄。<br>
+<img src="https://yjulm.com/post-images/1637585413568.png" alt="" loading="lazy"></p>
+<center>图 1-11 POINTER_INFO结构中的设备句柄</center> 
+<p>  后面同样的思路猜测第二参数应该与第一参数类似，并成功确认第二参数是监视器的设备句柄，于是整个函数定义的完整实现已经清晰明白，依据 32 和 64 位程序的不同参数类型与返回类型特点，最后写出最终的函数原型如下：</p>
+<pre><code class="language-c++">typedef WINUSERAPI LRESULT(WINAPI *NtUserSetDisplayMapping) (_In_ HANDLE touch, _In_ HMONITOR display);
+
+bool SetDisplayMapping(HANDLE touch, HMONITOR display)
+{
+    LRESULT ret = 0;
+    const auto proc = reinterpret_cast&lt;NtUserSetDisplayMapping&gt;(
+        GetProcAddress(GetModuleHandle(TEXT(&quot;user32&quot;)), MAKEINTRESOURCEA(2532)));
+    if (proc != nullptr)
+        ret = proc(touch, display);
+    return ret == 1;
+}
+</code></pre>
+<h3 id="21-取得设备句柄">2.1、 取得设备句柄</h3>
+<p>  <code>SetDisplayMapping</code> 函数接受两个设备句柄，则必须先要取得监视器和触摸的设备句柄。在此我们以设备路径做匹配条件，实现以下操作即可取得设备句柄：</p>
+<pre><code class="language-c++">BOOL __stdcall MonitorEnumProc(HMONITOR monitor, HDC hdc, LPRECT rect, LPARAM param)
+{
+    MONITORINFOEX info{};
+    info.cbSize = sizeof(MONITORINFOEX);
+    if (GetMonitorInfoW(monitor, &amp;info))
+    {
+        int i = 0;
+        while (true)
+        {
+            DISPLAY_DEVICE dev{};
+            dev.cb = sizeof(DISPLAY_DEVICE);
+
+            if (EnumDisplayDevices(info.szDevice, i++, &amp;dev, EDD_GET_DEVICE_INTERFACE_NAME))
+            {
+                //do something
+                //eg: compare process
+                bool compareResult = true;
+                if (compareResult)
+                {
+                    ((void**)param)[1] = monitor;
+                    return FALSE; //stop enum, Yes, we found it!
+                }
+            }
+            else
+                break;
+        }
+    }
+    return TRUE; //continue enum
+}
+
+HMONITOR Test::Test_GetDisplayDeviceHandle(wchar_t displayPath[MAX_PATH])
+{
+    void* param[2];
+    param[0] = displayPath;
+    param[1] = nullptr;
+
+    EnumDisplayMonitors(nullptr, nullptr, MonitorEnumProc, (LPARAM)&amp;param);
+    return static_cast&lt;HMONITOR&gt;(param[1]);
+}
+
+HANDLE Test::Test_GetTouchDeviceHandle(wchar_t hidPath[MAX_PATH])
+{
+    UINT count;
+    if (GetRawInputDeviceList(nullptr, &amp;count, sizeof(RAWINPUTDEVICELIST)) == 0)
+    {
+        PRAWINPUTDEVICELIST list = new RAWINPUTDEVICELIST[count];
+        if (GetRawInputDeviceList(list, &amp;count, sizeof(RAWINPUTDEVICELIST)))
+            for (UINT i = 0; i &lt; count; i++)
+                if (list[i].dwType == RIM_TYPEHID)
+                {
+                    UINT length = MAX_PATH;
+                    wchar_t path[MAX_PATH]{};
+                    if (GetRawInputDeviceInfo(list[i].hDevice, RIDI_DEVICENAME, path, &amp;length))
+                    {
+                        //do something
+                    }
+
+                    length = sizeof(RID_DEVICE_INFO);
+                    RID_DEVICE_INFO info{};
+                    info.cbSize = sizeof(RID_DEVICE_INFO);
+                    if (GetRawInputDeviceInfo(list[i].hDevice, RIDI_DEVICEINFO, &amp;info, &amp;length))
+                    {
+                        //do something
+                        //eg: info.hid.dwProductId, info.hid.dwVendorId, info.hid.usUsagePage, info.hid.usUsage;
+                    }
+
+                    length = 0;
+                    if (GetRawInputDeviceInfo(list[i].hDevice, RIDI_PREPARSEDDATA, nullptr, &amp;length) == 0)
+                    {
+                        LPBYTE data = new BYTE[length]{};
+                        if (GetRawInputDeviceInfo(list[i].hDevice, RIDI_PREPARSEDDATA, data, &amp;length))
+                        {
+                            PHIDP_PREPARSED_DATA preparsed = (PHIDP_PREPARSED_DATA)data;
+                            //do something
+                        }
+                        delete[] data;
+                    }
+
+                    return list[i].hDevice; //if the compare is success
+                }
+    }
+    return nullptr;
+}
+</code></pre>
+<h3 id="22-取得设备路径">2.2、 取得设备路径</h3>
+<p>  在上一小节中以设备路劲作为设备筛选的匹配条件，则如何取得设备路径就是关键操作。</p>
+<h4 id="221-取得触摸设备的路径">2.2.1、 取得触摸设备的路径</h4>
+<p>  在上方的 <code>Test_GetTouchDeviceHandle</code> 中使用 <code>GetRawInputDeviceInfo</code> 函数并搭配参数 <code>RIDI_DEVICENAME</code>、<code>RIDI_DEVICEINFO</code>、<code>RIDI_PREPARSEDDATA</code> 取得的多个信息，其实就能匹配并确认设备。获取触摸设备信息的另一个方式是采用通用 <a href="https://docs.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupdigetclassdevsa"><strong>SetupApi</strong></a> 枚举设备来实现：</p>
+<pre><code class="language-c++">bool Test::Test_GetTouchDevPath(wchar_t hid[MAX_PATH], int* len)
+{
+    bool ret = false;
+
+    GUID hidGuid{};
+    HidD_GetHidGuid(&amp;hidGuid);
+
+    HDEVINFO infoSet;
+    if ((infoSet = SetupDiGetClassDevs(&amp;hidGuid, nullptr, nullptr, DIGCF_DEVICEINTERFACE | DIGCF_PRESENT))
+        != INVALID_HANDLE_VALUE)
+    {
+        SP_DEVICE_INTERFACE_DATA interfaceData{};
+        interfaceData.cbSize = sizeof(SP_DEVICE_INTERFACE_DATA);
+
+        for (int interfaceIndex = 0
+             ; SetupDiEnumDeviceInterfaces(infoSet, nullptr, &amp;hidGuid, interfaceIndex, &amp;interfaceData)
+             ; ++interfaceIndex)
+        {
+            /*
+             * https://docs.microsoft.com/zh-cn/windows/win32/api/setupapi/nf-setupapi-setupdigetdeviceinterfacedetaila
+             */
+            DWORD detailReqSize{};
+            if (!SetupDiGetDeviceInterfaceDetail(infoSet, &amp;interfaceData, nullptr, 0, &amp;detailReqSize, nullptr)
+                //第一次取缓冲区大小，一定返回FALSE
+                &amp;&amp; GetLastError() == ERROR_INSUFFICIENT_BUFFER)
+            {
+                SP_DEVICE_INTERFACE_DETAIL_DATA* detailPtr = static_cast&lt;PSP_DEVICE_INTERFACE_DETAIL_DATA&gt;(calloc(
+                    detailReqSize, 1));
+                detailPtr-&gt;cbSize = sizeof(SP_DEVICE_INTERFACE_DETAIL_DATA);
+
+                if (SetupDiGetDeviceInterfaceDetail(infoSet, &amp;interfaceData, detailPtr, detailReqSize, &amp;detailReqSize,
+                                                    nullptr))
+                {
+                    /*
+                     * https://docs.microsoft.com/zh-cn/windows/win32/api/fileapi/nf-fileapi-createfilea#communications-resources
+                     * https://docs.microsoft.com/en-us/windows/win32/devio/communications-resource-handles
+                     * 系统一般会在设备插入时就Open设备，并以独占模式CreateFile
+                     * 在此时访问权限使用 0 能够确保在访问被拒绝时在不访问设备的情况下查询一些元数据
+                     * 同时还需要保证共享模式和系统已打开的模式不冲突
+                     */
+                    const HANDLE devPtr = CreateFile(detailPtr-&gt;DevicePath
+                        , 0, FILE_SHARE_READ | FILE_SHARE_WRITE, nullptr, OPEN_EXISTING, 0, nullptr);
+
+                    if (devPtr != INVALID_HANDLE_VALUE)
+                    {
+                        PHIDP_PREPARSED_DATA preparsedPtr{};
+                        if (HidD_GetPreparsedData(devPtr, &amp;preparsedPtr)) //TODO: Only user-mode applications can call
+                        {
+                            HIDP_CAPS caps{};
+                            if (HidP_GetCaps(preparsedPtr, &amp;caps) == HIDP_STATUS_SUCCESS)
+                            {
+                                //hidusage.h中没有，此处信息更具体:http://www.freebsddiary.org/APC/usb_hid_usages
+                                USAGE HID_USAGE_DIGITIZER_TOUCH_SCREEN = 0x04;
+
+                                if (caps.UsagePage == HID_USAGE_PAGE_DIGITIZER //数字化仪器,下属有触摸屏设备
+                                    &amp;&amp; caps.Usage == HID_USAGE_DIGITIZER_TOUCH_SCREEN)
+                                {
+                                    //do something eg: compare process
+
+                                    ret = wcscpy_s(hid, MAX_PATH, detailPtr-&gt;DevicePath) == 0;
+                                    *len = wcslen(detailPtr-&gt;DevicePath);
+                                }
+                            }
+
+                            HidD_FreePreparsedData(preparsedPtr);
+                        }
+
+                        CloseHandle(devPtr);
+                    }
+                }
+                free(detailPtr);
+            }
+            if (ret)
+                break;
+        }
+        SetupDiDestroyDeviceInfoList(infoSet);
+    }
+
+    return ret;
+}
+</code></pre>
+<h4 id="222-取得监视器设备路径">2.2.2、 取得监视器设备路径</h4>
+<p>  监视器的枚举操作除了上面的方法外，更广谱有效的方法是采用接口函数 <code>DisplayConfigGetDeviceInfo</code> 取得更加详细的信息，也有更多的可匹配参数可用：</p>
+<pre><code class="language-c++">void Test::Test_GetDisplayDevPath(wchar_t hid[MAX_PATH], int* len)
+{
+    UINT32 pathCount, modeCount;
+    if (GetDisplayConfigBufferSizes(QDC_ALL_PATHS, &amp;pathCount, &amp;modeCount) == ERROR_SUCCESS)
+    {
+        DISPLAYCONFIG_PATH_INFO* pathPtr = new DISPLAYCONFIG_PATH_INFO[pathCount]{};
+        DISPLAYCONFIG_MODE_INFO* modePtr = new DISPLAYCONFIG_MODE_INFO[modeCount]{};
+
+        if (QueryDisplayConfig(QDC_ALL_PATHS, &amp;pathCount, pathPtr, &amp;modeCount, modePtr, nullptr) == ERROR_SUCCESS)
+        {
+            if (pathPtr &amp;&amp; pathCount)
+                for (int i = 0; i &lt; pathCount; i++)
+                {
+                    const DISPLAYCONFIG_PATH_INFO&amp; path = pathPtr[i];
+                    {
+                        const LUID&amp; srcAdapterId = path.sourceInfo.adapterId;
+                        const LUID&amp; dstAdapterId = path.targetInfo.adapterId;
+                        const UINT&amp; srcId = path.sourceInfo.id;
+                        const UINT&amp; dstId = path.targetInfo.id;
+
+                        DISPLAYCONFIG_TARGET_DEVICE_NAME targetName{};
+                        targetName.header.size = sizeof(DISPLAYCONFIG_TARGET_DEVICE_NAME);
+                        targetName.header.type = DISPLAYCONFIG_DEVICE_INFO_GET_TARGET_NAME;
+                        targetName.header.adapterId = dstAdapterId;
+                        targetName.header.id = dstId;
+                        if (DisplayConfigGetDeviceInfo(&amp;targetName.header) == ERROR_SUCCESS)
+                        {
+                            bool hasPath = wcslen(targetName.monitorDevicePath); //有路径则说明设备在硬件层面上已连接
+                            if (hasPath)
+                            {
+                                DISPLAYCONFIG_SOURCE_DEVICE_NAME deviceName{};
+                                deviceName.header.size = sizeof(DISPLAYCONFIG_SOURCE_DEVICE_NAME);
+                                deviceName.header.type = DISPLAYCONFIG_DEVICE_INFO_GET_SOURCE_NAME;
+                                deviceName.header.adapterId = srcAdapterId;
+                                deviceName.header.id = srcId;
+                                if (DisplayConfigGetDeviceInfo(&amp;deviceName.header) == ERROR_SUCCESS)
+                                {
+                                    //do something
+                                }
+
+                                DISPLAYCONFIG_ADAPTER_NAME adapterName{};
+                                adapterName.header.size = sizeof(DISPLAYCONFIG_ADAPTER_NAME);
+                                adapterName.header.type = DISPLAYCONFIG_DEVICE_INFO_GET_ADAPTER_NAME;
+                                adapterName.header.adapterId = srcAdapterId;
+                                adapterName.header.id = srcId;
+                                if (DisplayConfigGetDeviceInfo(&amp;adapterName.header) == ERROR_SUCCESS)
+                                {
+                                    //do something
+                                }
+
+                                adapterName.header.adapterId = dstAdapterId;
+                                adapterName.header.id = dstId;
+                                if (DisplayConfigGetDeviceInfo(&amp;adapterName.header) == ERROR_SUCCESS)
+                                {
+                                    //do something
+                                }
+
+                                DISPLAYCONFIG_TARGET_PREFERRED_MODE preferredMode{};
+                                preferredMode.header.size = sizeof(DISPLAYCONFIG_TARGET_PREFERRED_MODE);
+                                preferredMode.header.type = DISPLAYCONFIG_DEVICE_INFO_GET_TARGET_PREFERRED_MODE;
+                                preferredMode.header.adapterId = dstAdapterId;
+                                preferredMode.header.id = dstId;
+                                if (DisplayConfigGetDeviceInfo(&amp;preferredMode.header) == ERROR_SUCCESS)
+                                {
+                                    //do something
+                                }
+
+                                DEVMODE devMode{};
+                                devMode.dmSize = sizeof(DEVMODE);
+                                if (EnumDisplaySettingsEx(deviceName.viewGdiDeviceName, ENUM_REGISTRY_SETTINGS, &amp;devMode, EDS_RAWMODE))
+                                {
+                                    //do something
+                                }
+                            }
+                        }
+                    }
+                }
+
+            delete[] pathPtr;
+            delete[] modePtr;
+        }
+    }
+}
+</code></pre>
+<p>更多其他信息可阅读文章《<a href="/post/custom-display-mode/">自定义显示器的显示模式原理和实现</a>》了解更多细节。</p>
+
+                </div>
+            </article>
+        </div>
+
+        
+            <div class="next-post">
+                <div class="next gt-c-content-color-first">下一篇</div>
+                <a href="https://yjulm.com/post/custom-display-mode/" class="post-title gt-a-link">
+                    自定义显示器的显示模式原理和实现
+                </a>
+            </div>
+        
+
+        
+            <div id="/post/touch-screen-binding/" class="leancloud_visitors" style="visibility:collapse" data-flag-title="显示器与触摸屏的一对一绑定原理和解析">
+            	当前文章阅读量为 <span id="/post/touch-screen-binding/" class="waline-pageview-count leancloud-visitors-count">0</span> 次
+            </div>
+        
+
+        
+
+        
+            <link href='https://fastly.jsdelivr.net/npm/@waline/client@v2/dist/waline.css' rel='stylesheet' />
+<script src='https://fastly.jsdelivr.net/npm/@waline/client@v2/dist/waline.js'></script>
+
+<style>
+	div#waline{
+		width:100%;
+		max-width: 1000px;
+		padding: 2.5%;
+	}
+	
+	span.katex { font-size: 20px; }
+	
+	.wl-emoji-popup { font-size: 16px !important; }
+	.wl-emoji-popup button { height: 2em; }
+</style>
+
+
+	<div id="waline"></div>
+
+<script>
+	Waline.init({
+		el: '#waline',
+		login: 'enable',
+		imageUploader: false,
+		search: false,
+		serverURL: 'https://waline-vercel.yjulm.com/',
+		pageSize: 10,
+		recordIp: true,
+		pageview: true,
+		commentSorting: 'hottest',
+		emoji: [
+				'//fastly.jsdelivr.net/npm/@waline/emojis/qq',
+				'//fastly.jsdelivr.net/npm/@waline/emojis/tw-emoji'
+		],
+		highlighter: function(code, lang) {
+			return hljs.highlight(code, {language: lang}).value;
+		},
+		texRenderer: function(blockMode, tex) {
+			var str = katex.renderToString(tex, {
+				displayMode: blockMode,
+				throwOnError: false,
+			});
+			return str;
+		}
+	});
+</script>
+
+        
+
+        <div class="site-footer gt-c-content-color-first">
+    <div class="slogan gt-c-content-color-first"></div>
+    <div class="social-container">
+        
+            
+                <a href="https://github.com/yjulm" target="_blank">
+                    <i class="fab fa-github gt-c-content-color-first"></i>
+                </a>
+            
+        
+            
+        
+            
+                <a href="https://weibo.com/yjulm" target="_blank">
+                    <i class="fab fa-weibo gt-c-content-color-first"></i>
+                </a>
+            
+        
+            
+                <a href="https://www.zhihu.com/people/yjulm" target="_blank">
+                    <i class="fab fa-zhihu gt-c-content-color-first"></i>
+                </a>
+            
+        
+            
+        
+            
+        
+    </div>
+    <div class="footer-info">
+        <div><p>平生知心者，屈指能有几。</p></div>
+    </div>
+    <div>
+        Theme by <a href="https://imhanjie.com/" target="_blank">imhanjie</a>, Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a>, <a href="https://yjulm.com/atom.xml" target="_blank">RSS</a>
+    </div>
+</div>
+
+        <script>
+  hljs.highlightAll();
+</script>
+
+        <script>
+(function() {
+	function addEventListener(element, type, handler) {
+        if (element.addEventListener) {
+            element.addEventListener(type, handler, false);
+        } else if (element.attachEvent) {
+            element.attachEvent('on' + type, handler);
+        }
+    }
+
+    addEventListener(window, 'load', function () {
+        var Viewer = window.Viewer;
+        var pictures = document.querySelector('.post-content');
+        var viewer = new Viewer(pictures);
+    });
+})();
+</script>
+
+
+        <script>
+            var ele = document.querySelector(".waline-pageview-count");
+            Object.defineProperty(ele, 'innerText', {
+                get: function() {
+                    return ele.innerText;
+                },
+                set: function(value) {
+                    ele.innerHTML = value;
+                    if (value > 0) {
+	                    var parent = document.querySelector(".leancloud_visitors");
+	                    parent.style.visibility="visible";
+	                }
+                }
+            });
+        </script>
+    </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,906 @@
+<html lang="zh">
+<head>
+    <meta charset="utf-8" />
+<meta name="description" content="" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+<title>自定义显示器的显示模式原理和实现 | Yjulm</title>
+
+<link rel="shortcut icon" href="https://yjulm.com/favicon.ico?v=1670599107006">
+
+<link href="https://fastly.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://yjulm.com/styles/main.css">
+
+<!-- <link rel="stylesheet" href="https://fastly.jsdelivr.net/npm/bootstrap@4.5.0/dist/css/bootstrap.min.css"> -->
+<!-- <script src="https://fastly.jsdelivr.net/npm/moment@2.27.0/moment.min.js"></script> -->
+<!-- <script src="https://fastly.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js"></script> -->
+<!-- <script src="https://fastly.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"></script> -->
+<!-- <script src="https://fastly.jsdelivr.net/npm/bootstrap@4.5.0/dist/js/bootstrap.min.js"></script> -->
+<!-- DEMO JS -->
+<!--<script src="media/scripts/index.js"></script>-->
+
+
+
+    
+<link rel="stylesheet" href="https://fastly.jsdelivr.net/gh/highlightjs/cdn-release@11.3.1/build/styles/base16/solarized-light.min.css">
+
+<script src="https://fastly.jsdelivr.net/combine/gh/highlightjs/cdn-release@11.3.1/build/highlight.min.js,gh/highlightjs/cdn-release@11.3.1/build/languages/cpp.min.js,gh/highlightjs/cdn-release@11.3.1/build/languages/csharp.min.js,gh/highlightjs/cdn-release@11.3.1/build/languages/c.min.js,gh/highlightjs/cdn-release@11.3.1/build/languages/python.min.js,gh/highlightjs/cdn-release@11.3.1/build/languages/rust.min.js,gh/highlightjs/cdn-release@11.3.1/build/languages/xml.min.js,gh/highlightjs/cdn-release@11.3.1/build/languages/javascript.min.js,gh/highlightjs/cdn-release@11.3.1/build/languages/powershell.min.js,gh/highlightjs/cdn-release@11.3.1/build/languages/shell.min.js,gh/highlightjs/cdn-release@11.3.1/build/languages/sql.min.js,gh/highlightjs/cdn-release@11.3.1/build/languages/http.min.js,gh/highlightjs/cdn-release@11.3.1/build/languages/go.min.js,gh/highlightjs/cdn-release@11.3.1/build/languages/css.min.js"></script>
+
+<!-- <script src="https://fastly.jsdelivr.net/gh/highlightjs/cdn-release@11.3.1/build/highlight.min.js"></script>
+<script src="https://fastly.jsdelivr.net/gh/highlightjs/cdn-release@11.3.1/build/languages/cpp.min.js"></script>
+<script src="https://fastly.jsdelivr.net/gh/highlightjs/cdn-release@11.3.1/build/languages/csharp.min.js"></script>
+<script src="https://fastly.jsdelivr.net/gh/highlightjs/cdn-release@11.3.1/build/languages/c.min.js"></script>
+<script src="https://fastly.jsdelivr.net/gh/highlightjs/cdn-release@11.3.1/build/languages/python.min.js"></script>
+<script src="https://fastly.jsdelivr.net/gh/highlightjs/cdn-release@11.3.1/build/languages/rust.min.js"></script>
+<script src="https://fastly.jsdelivr.net/gh/highlightjs/cdn-release@11.3.1/build/languages/xml.min.js"></script>
+<script src="https://fastly.jsdelivr.net/gh/highlightjs/cdn-release@11.3.1/build/languages/javascript.min.js"></script>
+<script src="https://fastly.jsdelivr.net/gh/highlightjs/cdn-release@11.3.1/build/languages/powershell.min.js"></script>
+<script src="https://fastly.jsdelivr.net/gh/highlightjs/cdn-release@11.3.1/build/languages/shell.min.js"></script>
+<script src="https://fastly.jsdelivr.net/gh/highlightjs/cdn-release@11.3.1/build/languages/sql.min.js"></script>
+<script src="https://fastly.jsdelivr.net/gh/highlightjs/cdn-release@11.3.1/build/languages/http.min.js"></script>
+<script src="https://fastly.jsdelivr.net/gh/highlightjs/cdn-release@11.3.1/build/languages/go.min.js"></script>
+<script src="https://fastly.jsdelivr.net/gh/highlightjs/cdn-release@11.3.1/build/languages/css.min.js"></script>
+ -->
+
+    <script src="https://fastly.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+<script>mermaid.initialize({startOnLoad:true});</script>
+
+    <link rel="stylesheet" href="https://fastly.jsdelivr.net/npm/viewerjs@1.10.2/dist/viewer.min.css" />
+<script src="https://fastly.jsdelivr.net/npm/viewerjs@1.10.2/dist/viewer.min.js"></script>
+
+    <link rel="stylesheet" href="https://fastly.jsdelivr.net/npm/katex@0.16.4/dist/katex.min.css">
+    <script src="https://fastly.jsdelivr.net/npm/katex@0.16.4/dist/katex.min.js"></script>
+    <script src="https://fastly.jsdelivr.net/npm/katex@0.16.4/dist/contrib/auto-render.min.js"></script>
+</head>
+<body>
+<div class="main gt-bg-theme-color-first">
+    <nav class="navbar navbar-expand-lg">
+    <a class="navbar-brand" href="/">
+        <img class="user-avatar" src="/images/avatar.png" alt="头像">
+        <div class="site-name gt-c-content-color-first">
+            Yjulm
+        </div>
+    </a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+        aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation" id="changeNavbar">
+        <i class="fas fa-bars gt-c-content-color-first" style="font-size: 18px"></i>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <div class="navbar-nav mr-auto" style="text-align: center">
+            
+            <div class="nav-item">
+                
+                <a href="/" class="menu gt-a-link">
+                    首页
+                </a>
+                
+            </div>
+            
+            <div class="nav-item">
+                
+                <a href="/archives" class="menu gt-a-link">
+                    归档
+                </a>
+                
+            </div>
+            
+            <div class="nav-item">
+                
+                <a href="/tags" class="menu gt-a-link">
+                    标签
+                </a>
+                
+            </div>
+            
+            <div class="nav-item">
+                
+                <a href="/post/about" class="menu gt-a-link">
+                    关于
+                </a>
+                
+            </div>
+            
+        </div>
+        <div style="text-align: center">
+            <form id="gridea-search-form" style="position: relative" data-update="1670599107006"
+                action="/search/">
+                <input class="search-input" autocomplete="off" spellcheck="false" name="q" placeholder="搜索文章" />
+                <i class="fas fa-search gt-c-content-color-first" style="position: absolute; top: 9px; left: 10px;"></i>
+            </form>
+        </div>
+    </div>
+</nav>
+<script>
+    /* 移动端导航栏展开/收起切换 */
+    document.getElementById('changeNavbar').onclick = function () {
+        var element = document.getElementById('navbarSupportedContent');
+        if (element.style.display === 'none' || element.style.display === '') {
+            element.style.display = 'block';
+        } else {
+            element.style.display = 'none';
+        }
+    }
+</script>
+
+    <div class="post-container">
+        <div class="post-detail gt-bg-theme-color-second">
+            <article class="gt-post-content">
+                <h2 class="post-title">
+                    自定义显示器的显示模式原理和实现
+                </h2>
+                <div class="post-info">
+                    <time class="post-time gt-c-content-color-first">
+                        · 2021-11-18 ·
+                    </time>
+                    
+                        <a href="https://yjulm.com/tag/screen/" class="post-tags">
+                            # Screen
+                        </a>
+                    
+                        <a href="https://yjulm.com/tag/display/" class="post-tags">
+                            # Display
+                        </a>
+                    
+                </div>
+                <div class="post-content">
+                    <p>  在Windows系统的显示器设置中，微软为我们提供了如下的设置界面，来完成多屏幕的显示方案定制。比如设置多个屏幕的空间排列和显示方向、设置每个屏幕的分辨率大小、调整主显示屏幕、以及调整多个屏幕的协作能力是复制还是扩展。那么在此基础上，如何用代码自动化设置一个固定显示设置方案？下面将从基础API接口详细介绍显示器设置如何自定义。<br>
+<img src="https://yjulm.com/post-images/1637282533302.png" alt="" loading="lazy"></p>
+<center>图1 - 系统显示器设置</center>
+<p>  随着Windows历史发展，Windows发展出了两套不兼容的显示驱动模型。其分别是 Windows 2000/XP 以 NT5 为内核的XDDM驱动模型，以及后来的 Windows Vista/7/8/10 这些以 NT6 为内核的WDDM驱动模型。在此过程中屏幕相关的设置API也发展出了两代，其中 XDDM 模型的 API 接口主要以 <code>DEVMODE</code> 结构为主，WDDM模型的 API 接口主要以 <code>DISPLAYCONFIG</code> 为前缀的结构为主。</p>
+<h1 id="一-xddm">一、 XDDM</h1>
+<p>  由于XDDM模型主要是为2000/XP等老式系统设计，在此我们不主要使用该模式的下接口。但该模式下的 API 接口有助于帮助我们理解Windows的显示模型。所以在此提出，该模型下主要提供以下几个主要接口函数：</p>
+<blockquote>
+<ul>
+<li>EnumDisplayDevices</li>
+<li>EnumDisplayMonitors</li>
+<li>EnumDisplaySettings</li>
+<li>EnumDisplaySettingsEx</li>
+<li>ChangeDisplaySettings</li>
+<li>ChangeDisplaySettingsEx</li>
+<li>GetMonitorInfo</li>
+</ul>
+</blockquote>
+<p>  在此我们主要使用 <code>EnumDisplayDevices</code> 接口函数，该函数的原型定义如下：</p>
+<pre><code class="language-c++">BOOL EnumDisplayDevicesW(
+  [in]  LPCWSTR          lpDevice,
+  [in]  DWORD            iDevNum,
+  [out] PDISPLAY_DEVICEW lpDisplayDevice,
+  [in]  DWORD            dwFlags
+);
+</code></pre>
+<h2 id="1-枚举适配器信息">1、 枚举适配器信息</h2>
+<p>  依据该函数的官方 Remark 说明，不指定 <em><strong>lpDevice</strong></em>，并递增 <em><strong>iDevNum</strong></em> 做循环枚举操作，来取得显示适配器的信息。</p>
+<pre><code class="language-c#">void XDDM::PrintAdapter(std::vector&lt;DISPLAY_DEVICE&gt;&amp; devices)
+{
+    devices.clear();
+    int index = 0;
+
+    while (true)
+    {
+        DISPLAY_DEVICE dev{};
+        dev.cb = sizeof(DISPLAY_DEVICE);
+        if (EnumDisplayDevices(nullptr, index, &amp;dev, 0)) //使用nullptr取得显示卡适配器信息，也可用适配器名称进而取得显示器信息
+        {
+            if (!(dev.StateFlags &amp; DISPLAY_DEVICE_MIRRORING_DRIVER))
+            {
+                devices.push_back(dev);
+                bool active = dev.StateFlags &amp; DISPLAY_DEVICE_ATTACHED_TO_DESKTOP; //当前接口是否启用了
+
+                //do something
+            }
+
+            ++index;
+            WLOG(L&quot;ADAPTER==&gt; \t devName:%s \t devId:%s \r\n&quot;, dev.DeviceName, dev.DeviceID);
+        }
+        else
+            break;
+    }
+}
+</code></pre>
+<p>  通过上述操作我们可以枚举到如下的显示适配器信息，所谓的显示适配器其实就是GPU显卡。在此我们需要理解一个概念即 &quot;<strong>同一适配器上可挂接多个监视器</strong>&quot;，换句话说就是当前系统上有多少个硬件接口，系统就会注册对应数量的显示器编号 <code>\\.\DISPLAY*</code>。</p>
+<pre><code>ADAPTER==&gt;       devName:\\.\DISPLAY1    devId:PCI\VEN_8086&amp;DEV_0412&amp;SUBSYS_85341043&amp;REV_06
+ADAPTER==&gt;       devName:\\.\DISPLAY2    devId:PCI\VEN_8086&amp;DEV_0412&amp;SUBSYS_85341043&amp;REV_06
+ADAPTER==&gt;       devName:\\.\DISPLAY3    devId:PCI\VEN_8086&amp;DEV_0412&amp;SUBSYS_85341043&amp;REV_06
+</code></pre>
+<p>  从设备信息打印中可看到 <em><strong>devId</strong></em> 都相同，而不同的三个 <em><strong>devName</strong></em> 接口分别注册在系统注册表中，分别对应的是主板上的三个显示器插槽（DVI、HDMI、VGA）。该解释无从考证，但我们可以通过<a href="https://ark.intel.com/content/www/cn/zh/ark/products/77480/intel-core-i34130-processor-3m-cache-3-40-ghz.html#tab-blade-1-0-4">CPU</a>规格书中的“显示器数量”和“图形输出”信息，以及主板的插槽设计佐证这一点。</p>
+<h2 id="2-枚举监视器信息">2、 枚举监视器信息</h2>
+<p>  枚举到适配器信息后，以适配器名称传参至 <em><strong>lpDevice</strong></em>，并递增 <em><strong>iDevNum</strong></em> 再次做循环枚举操作，来取得显示监视器的信息。</p>
+<pre><code class="language-c#">void XDDM::PrintMonitor(std::vector&lt;DISPLAY_DEVICE&gt;&amp; devices)
+{
+    bool find = false;
+
+    if (!devices.empty())
+    {
+        for (auto dev = devices.begin(); dev != devices.end();)
+        {
+            int index = 0;
+            while (true)
+            {
+                DISPLAY_DEVICE tempDev{};
+                tempDev.cb = sizeof(DISPLAY_DEVICE);
+                if (EnumDisplayDevices(dev-&gt;DeviceName, index, &amp;tempDev, EDD_GET_DEVICE_INTERFACE_NAME))
+                {
+                    bool active = tempDev.StateFlags &amp; DISPLAY_DEVICE_ACTIVE;
+                    //do something
+
+                    ++index;
+                    WLOG(L&quot;MONITOR==&gt; \t devName:%s \t active:%d \t attached:%d \ndevId:%s \r\n\n&quot;
+                         , tempDev.DeviceName
+                         , tempDev.StateFlags &amp; DISPLAY_DEVICE_ACTIVE
+                         , tempDev.StateFlags &amp; DISPLAY_DEVICE_ATTACHED
+                         , tempDev.DeviceID
+                    );
+                }
+                else
+                {
+                    ++dev; //goto next
+                    break;
+                }
+            }
+        }
+    }
+}
+</code></pre>
+<p>  通过以上操作可取得如下的详细监视器信息，注意：</p>
+<pre><code>MONITOR==&gt;       devName:\\.\DISPLAY1\Monitor0   active:1        attached:2
+devId:\\?\DISPLAY#TCL0000#4&amp;35aefc14&amp;0&amp;UID50725632#{e6f07b5f-ee97-4a90-b076-33f57bf4eaa7}
+
+MONITOR==&gt;       devName:\\.\DISPLAY2\Monitor0   active:1        attached:2
+devId:\\?\DISPLAY#HKC21A6#4&amp;35aefc14&amp;0&amp;UID16843008#{e6f07b5f-ee97-4a90-b076-33f57bf4eaa7}
+</code></pre>
+<p>  从上方的监视器信息打印中可了解一个基础信息，<strong>监视器</strong>挂接在<strong>适配器端口</strong>下。上面这些基础打印信息有助于我们使用WDDM模型接口函数。</p>
+<h1 id="二-wddm">二、 WDDM</h1>
+<p>  WDDM是我们实现自定义的设置的主要接口模型，该接口模型下主要提供以下接口函数：</p>
+<blockquote>
+<ul>
+<li>DisplayConfigGetDeviceInfo</li>
+<li>DisplayConfigSetDeviceInfo</li>
+<li>GetDisplayConfigBufferSizes</li>
+<li>QueryDisplayConfig</li>
+<li>SetDisplayConfig</li>
+</ul>
+</blockquote>
+<p>  <strong>需要注意是的 <code>GetDisplayConfigBufferSizes</code>、<code>QueryDisplayConfig</code>、<code>SetDisplayConfig</code>  这几个函数要求程序是桌面程序，拥有访问控制台会话或桌面能力否者将其返回 <code>ERROR_ACCESS_DENIED</code>。</strong></p>
+<p>  在WDDM模型中，微软简化了配置方式。抽象出了两个概念 <code>PATH</code> 和 <code>MODE</code>，后续的所有操作均围绕这两个概念展开。其中 <code>MODE</code> 相关的原型结构定义如下：</p>
+<pre><code class="language-c++">typedef struct DISPLAYCONFIG_SOURCE_MODE
+{
+    UINT32                      width;
+    UINT32                      height;
+    DISPLAYCONFIG_PIXELFORMAT   pixelFormat;
+    POINTL                      position;
+} DISPLAYCONFIG_SOURCE_MODE;
+
+typedef struct DISPLAYCONFIG_TARGET_MODE
+{
+    DISPLAYCONFIG_VIDEO_SIGNAL_INFO   targetVideoSignalInfo;
+} DISPLAYCONFIG_TARGET_MODE;
+
+typedef struct DISPLAYCONFIG_MODE_INFO
+{
+    DISPLAYCONFIG_MODE_INFO_TYPE    infoType;
+    UINT32                          id;
+    LUID                            adapterId;
+    union
+    {
+        DISPLAYCONFIG_TARGET_MODE   targetMode;
+        DISPLAYCONFIG_SOURCE_MODE   sourceMode;
+    };
+} DISPLAYCONFIG_MODE_INFO;
+</code></pre>
+<p>  而 <code>PATH</code> 相关的原型结构定义如下：</p>
+<pre><code class="language-c++">typedef struct DISPLAYCONFIG_PATH_SOURCE_INFO
+{
+    LUID    adapterId;
+    UINT32  id;
+    UINT32  modeInfoIdx;
+    UINT32  statusFlags;
+} DISPLAYCONFIG_PATH_SOURCE_INFO;
+
+typedef struct DISPLAYCONFIG_PATH_TARGET_INFO
+{
+    LUID                                    adapterId;
+    UINT32                                  id;
+    UINT32                                  modeInfoIdx;
+    DISPLAYCONFIG_VIDEO_OUTPUT_TECHNOLOGY   outputTechnology;
+    DISPLAYCONFIG_ROTATION                  rotation;
+    DISPLAYCONFIG_SCALING                   scaling;
+    DISPLAYCONFIG_RATIONAL                  refreshRate;
+    DISPLAYCONFIG_SCANLINE_ORDERING         scanLineOrdering;
+    BOOL                                    targetAvailable;
+    UINT32                                  statusFlags;
+} DISPLAYCONFIG_PATH_TARGET_INFO;
+
+typedef struct DISPLAYCONFIG_PATH_INFO
+{
+    DISPLAYCONFIG_PATH_SOURCE_INFO  sourceInfo;
+    DISPLAYCONFIG_PATH_TARGET_INFO  targetInfo;
+    UINT32                          flags;
+} DISPLAYCONFIG_PATH_INFO;
+</code></pre>
+<p>  从定义中有些难以理解这两者之间关系，我们通过一些操作将其打印出实际数据，更方便观察其两者之间的相互关系。</p>
+<h2 id="1-如何设置显示模式">1、 如何设置显示模式</h2>
+<p>  要想设置显示模式则其主要操作是构建一个 <code>PATH</code> 与 <code>MODE</code> 的匹配对列。并最终交由函数 <code>SetDisplayConfig</code> 执行设置操作。要实现这一过程则先需要弄清楚这两者之前的匹配关系。</p>
+<h3 id="11-打印-path-与-mode-的数据">1.1 打印 PATH 与 MODE 的数据</h3>
+<p>  首先我们定义一个辅助结构如下：</p>
+<pre><code class="language-c++">typedef struct _DISPLAYCONFIG_SETTING_INFO
+{
+    std::shared_ptr&lt;DISPLAYCONFIG_PATH_INFO&gt; pathPtr;
+    size_t pathCount;
+    std::shared_ptr&lt;DISPLAYCONFIG_MODE_INFO&gt; modePtr;
+    size_t modeCount;
+} DISPLAYCONFIG_SETTING_INFO;
+</code></pre>
+<p>  依据微软官方文档搭配 <code>GetDisplayConfigBufferSizes</code> 与 <code>QueryDisplayConfig</code> 这两接口函数取得当前系统内的显示设置。</p>
+<pre><code class="language-c++">bool WDDM::GetPathModeInfo(DISPLAYCONFIG_SETTING_INFO&amp; setInfo, bool queryAll)
+{
+    //这几个函数 GetDisplayConfigBufferSizes / QueryDisplayConfig / SetDisplayConfig
+    //要求程序是桌面程序，拥有访问控制台会话或桌面否者将其返回 ERROR_ACCESS_DENIED
+
+    if (GetDisplayConfigBufferSizes(queryAll ? QDC_ALL_PATHS : QDC_ONLY_ACTIVE_PATHS, &amp;setInfo.pathCount,
+        &amp;setInfo.modeCount) == ERROR_SUCCESS)
+    {
+        setInfo.pathPtr = std::shared_ptr&lt;DISPLAYCONFIG_PATH_INFO&gt;(new DISPLAYCONFIG_PATH_INFO[setInfo.pathCount]{}, std::default_delete&lt;DISPLAYCONFIG_PATH_INFO[]&gt;{});
+        setInfo.modePtr = std::shared_ptr&lt;DISPLAYCONFIG_MODE_INFO&gt;(new DISPLAYCONFIG_MODE_INFO[setInfo.modeCount]{}, std::default_delete&lt;DISPLAYCONFIG_MODE_INFO[]&gt;{});
+
+        return QueryDisplayConfig(queryAll ? QDC_ALL_PATHS : QDC_ONLY_ACTIVE_PATHS
+            , &amp;setInfo.pathCount
+            , setInfo.pathPtr.get()
+            , &amp;setInfo.modeCount
+            , setInfo.modePtr.get()
+            , nullptr) == ERROR_SUCCESS;
+    }
+    return false;
+}
+</code></pre>
+<p>  此时取得的 PATH 和 MODE 信息还比较简陋，还需要继续对其数据进行查询。为此我很还需要再定义一个带有扩展的数据的 <code>DISPLAYCONFIG_PATH_INFO_EX</code>如下：</p>
+<pre><code class="language-c++">typedef struct _PATH_INFO_EX
+{
+    DISPLAYCONFIG_SOURCE_MODE srcMode;
+
+    //DISPLAYCONFIG_SOURCE_DEVICE_NAME
+    wchar_t srcDevName[32];
+
+    //DISPLAYCONFIG_TARGET_PREFERRED_MODE
+    unsigned int dstWidth;
+    unsigned int dstHeight;
+    DISPLAYCONFIG_TARGET_MODE dstMode;
+
+    //DEVMODE devMode{};
+    //devMode.dmSize = sizeof(DEVMODE);
+    //EnumDisplaySettingsEx(srcDevName, ENUM_REGISTRY_SETTINGS, &amp;devMode, EDS_RAWMODE))
+    DISPLAYCONFIG_PIXELFORMAT dstPixelFormat;
+
+    //DISPLAYCONFIG_ADAPTER_NAME
+    wchar_t srcAdapterPath[128];
+    wchar_t dstAdapterPath[128];
+
+    //DISPLAYCONFIG_TARGET_DEVICE_NAME
+    wchar_t dstMonitorName[64];
+    wchar_t dstMonitorPath[128];
+    DISPLAYCONFIG_VIDEO_OUTPUT_TECHNOLOGY dstOutputTechnology;
+} PATH_INFO_EX;
+
+typedef struct _DISPLAYCONFIG_PATH_INFO_EX
+{
+    DISPLAYCONFIG_PATH_INFO path;
+    PATH_INFO_EX ex;
+} DISPLAYCONFIG_PATH_INFO_EX;
+</code></pre>
+<p>  基于 <code>DisplayConfigGetDeviceInfo</code> 接口函数，依据不同参数类型取得该 <code>PATH</code> 的其他可用信息并将其存储到一个新的<code>PATH</code>队列。其中在查询过程对其 <code>PATH</code> 的有效性做过滤，对于查询不到监视器的设备路径的 <code>PATH</code> 应当认定为没有物理连接从而对其丢弃。该操作实现如下：</p>
+<pre><code class="language-c++">bool WDDM::FillInfoEx(DISPLAYCONFIG_SETTING_INFO &amp;setInfo, DISPLAYCONFIG_PATH_INFO_EX&amp; infoEx, bool &amp;isDefault)
+{
+    LUID&amp; srcAdapterId = infoEx.path.sourceInfo.adapterId;
+    LUID&amp; dstAdapterId = infoEx.path.targetInfo.adapterId;
+    UINT&amp; srcId = infoEx.path.sourceInfo.id;
+    UINT&amp; dstId = infoEx.path.targetInfo.id;
+
+    DISPLAYCONFIG_TARGET_DEVICE_NAME targetName{};
+    targetName.header.size = sizeof(DISPLAYCONFIG_TARGET_DEVICE_NAME);
+    targetName.header.type = DISPLAYCONFIG_DEVICE_INFO_GET_TARGET_NAME;
+    targetName.header.adapterId = dstAdapterId;
+    targetName.header.id = dstId;
+    if (DisplayConfigGetDeviceInfo(&amp;targetName.header) == ERROR_SUCCESS)
+    {
+        infoEx.ex.dstOutputTechnology = targetName.outputTechnology;
+        wcscpy_s(infoEx.ex.dstMonitorPath, targetName.monitorDevicePath);
+        wcscpy_s(infoEx.ex.dstMonitorName, targetName.monitorFriendlyDeviceName);
+
+        isDefault = wcsstr(infoEx.ex.dstMonitorPath, L&quot;Default_Monitor&quot;) != nullptr; //不插显示器开机时系统的默认路径
+        bool hasName = wcslen(infoEx.ex.dstMonitorName); //系统默认监视器就没有名称
+        bool hasPath = wcslen(infoEx.ex.dstMonitorPath);
+
+        //TODO: 系统会保留以往插过的显示器配置，但如果当前没有插入则不会有监视器的设备路径
+        //TODO: 在不插任何显示器是系统有默认的输出监视器，且没有名称，在变为默认监视器时好像还会保留最后一次配置正确的 dstOutputTechnology
+        //所以不能单纯的用有没有名称来判断有效性，此处同时使用监视器设备路径来确定，只有有路径则说明设备在硬件层面上已连接
+        if (hasPath)
+        {
+            DISPLAYCONFIG_SOURCE_DEVICE_NAME deviceName{};
+            deviceName.header.size = sizeof(DISPLAYCONFIG_SOURCE_DEVICE_NAME);
+            deviceName.header.type = DISPLAYCONFIG_DEVICE_INFO_GET_SOURCE_NAME;
+            deviceName.header.adapterId = srcAdapterId;
+            deviceName.header.id = srcId;
+            if (DisplayConfigGetDeviceInfo(&amp;deviceName.header) == ERROR_SUCCESS)
+                wcscpy_s(infoEx.ex.srcDevName, deviceName.viewGdiDeviceName);
+
+            DISPLAYCONFIG_ADAPTER_NAME adapterName{};
+            adapterName.header.size = sizeof(DISPLAYCONFIG_ADAPTER_NAME);
+            adapterName.header.type = DISPLAYCONFIG_DEVICE_INFO_GET_ADAPTER_NAME;
+            adapterName.header.adapterId = srcAdapterId;
+            if (DisplayConfigGetDeviceInfo(&amp;adapterName.header) == ERROR_SUCCESS)
+                wcscpy_s(infoEx.ex.srcAdapterPath, adapterName.adapterDevicePath) == 0;
+
+            adapterName.header.adapterId = dstAdapterId;
+            if (DisplayConfigGetDeviceInfo(&amp;adapterName.header) == ERROR_SUCCESS)
+                wcscpy_s(infoEx.ex.dstAdapterPath, adapterName.adapterDevicePath) == 0;
+
+            DISPLAYCONFIG_TARGET_PREFERRED_MODE preferredMode{};
+            preferredMode.header.size = sizeof(DISPLAYCONFIG_TARGET_PREFERRED_MODE);
+            preferredMode.header.type = DISPLAYCONFIG_DEVICE_INFO_GET_TARGET_PREFERRED_MODE;
+            preferredMode.header.adapterId = dstAdapterId;
+            preferredMode.header.id = dstId;
+            if (DisplayConfigGetDeviceInfo(&amp;preferredMode.header) == ERROR_SUCCESS)
+            {
+                infoEx.ex.dstWidth = preferredMode.width;
+                infoEx.ex.dstHeight = preferredMode.height;
+                infoEx.ex.dstMode = preferredMode.targetMode;
+            }
+
+            DEVMODE devMode{};
+            devMode.dmSize = sizeof(DEVMODE);
+            if (EnumDisplaySettingsEx(infoEx.ex.srcDevName, ENUM_REGISTRY_SETTINGS, &amp;devMode, EDS_RAWMODE)) //直接从注册设置中取得像素位
+                infoEx.ex.dstPixelFormat =
+                devMode.dmBitsPerPel == 8
+                ? DISPLAYCONFIG_PIXELFORMAT_8BPP
+                : devMode.dmBitsPerPel == 16
+                ? DISPLAYCONFIG_PIXELFORMAT_16BPP
+                : devMode.dmBitsPerPel == 24
+                ? DISPLAYCONFIG_PIXELFORMAT_24BPP
+                : devMode.dmBitsPerPel == 32
+                ? DISPLAYCONFIG_PIXELFORMAT_32BPP
+                : DISPLAYCONFIG_PIXELFORMAT_NONGDI;
+
+            if (setInfo.modePtr &amp;&amp; setInfo.modeCount)
+                for (int srcModeIdx = 0; srcModeIdx &lt; setInfo.modeCount; srcModeIdx++)
+                {
+                    const DISPLAYCONFIG_MODE_INFO &amp;modeRef = setInfo.modePtr.get()[srcModeIdx];
+                    if (modeRef.id == infoEx.path.sourceInfo.id)
+                        infoEx.ex.srcMode = setInfo.modePtr.get()[srcModeIdx].sourceMode;
+                }
+
+            return true;
+        }
+    }
+
+    return false;
+}
+</code></pre>
+<p>  当前期扩展信息获取可用以后，现在我们准备一下 <em><strong>Debug</strong></em> 环境，实现对有效扩展信息的打印，帮助后期分析。</p>
+<pre><code class="language-c++">#define LOG(fmt, ...) printf(fmt, ##__VA_ARGS__)
+#define WLOG(fmt, ...) wprintf(fmt, ##__VA_ARGS__)
+
+#define MODE_TYPE(type) \
+		type == DISPLAYCONFIG_MODE_INFO_TYPE_SOURCE \
+		? L&quot;source&quot; \
+		: type == DISPLAYCONFIG_MODE_INFO_TYPE_TARGET \
+		? L&quot;target&quot; \
+		: L&quot;other&quot;
+
+#define MODE_POSITION_X(type, modeRef) \
+		type == DISPLAYCONFIG_MODE_INFO_TYPE_SOURCE \
+		? modeRef.sourceMode.position.x \
+		: -1
+
+#define MODE_POSITION_Y(type, modeRef) \
+		type == DISPLAYCONFIG_MODE_INFO_TYPE_SOURCE \
+		? modeRef.sourceMode.position.y \
+		: -1
+
+#define MODE_INFO_FMT L&quot;MODE==&gt; \t idx:%d \t id:0x%08x \t adpId:0x%08x \t type:%s \t x:%4d  y:%4d \n&quot;
+
+#define SHOW_MODE_INFO(i, modeRef) WLOG(MODE_INFO_FMT \
+		, i \
+		, modeRef.id \
+		, modeRef.adapterId.LowPart \
+		, MODE_TYPE(modeRef.infoType) \
+		, MODE_POSITION_X(modeRef.infoType, modeRef) \
+		, MODE_POSITION_Y(modeRef.infoType, modeRef) \
+		)
+
+#define PATH_TECH(tech) \
+		tech == DISPLAYCONFIG_OUTPUT_TECHNOLOGY_HD15 \
+		? L&quot;VGA&quot; \
+		: tech == DISPLAYCONFIG_OUTPUT_TECHNOLOGY_SVIDEO \
+		? L&quot;SVIDEO&quot; \
+		: tech == DISPLAYCONFIG_OUTPUT_TECHNOLOGY_COMPOSITE_VIDEO \
+		? L&quot;COMPOSITE_VIDEO&quot; \
+		: tech == DISPLAYCONFIG_OUTPUT_TECHNOLOGY_COMPONENT_VIDEO \
+		? L&quot;COMPONENT_VIDEO&quot; \
+		: tech == DISPLAYCONFIG_OUTPUT_TECHNOLOGY_DVI \
+		? L&quot;DVI&quot; \
+		: tech == DISPLAYCONFIG_OUTPUT_TECHNOLOGY_HDMI \
+		? L&quot;HDMI&quot; \
+		: tech == DISPLAYCONFIG_OUTPUT_TECHNOLOGY_LVDS \
+		? L&quot;LVDS&quot; \
+		: tech == DISPLAYCONFIG_OUTPUT_TECHNOLOGY_D_JPN \
+		? L&quot;D_JPN&quot; \
+		: tech == DISPLAYCONFIG_OUTPUT_TECHNOLOGY_SDI \
+		? L&quot;SDI&quot; \
+		: tech == DISPLAYCONFIG_OUTPUT_TECHNOLOGY_DISPLAYPORT_EXTERNAL \
+		? L&quot;DISPLAYPORT_EXTERNAL&quot; \
+		: tech == DISPLAYCONFIG_OUTPUT_TECHNOLOGY_DISPLAYPORT_EMBEDDED \
+		? L&quot;DISPLAYPORT_EMBEDDED&quot; \
+		: tech == DISPLAYCONFIG_OUTPUT_TECHNOLOGY_UDI_EXTERNAL \
+		? L&quot;UDI_EXTERNAL&quot; \
+		: tech == DISPLAYCONFIG_OUTPUT_TECHNOLOGY_UDI_EMBEDDED \
+		? L&quot;UDI_EMBEDDED&quot; \
+		: tech == DISPLAYCONFIG_OUTPUT_TECHNOLOGY_SDTVDONGLE \
+		? L&quot;SDTVDONGLE&quot; \
+		: tech == DISPLAYCONFIG_OUTPUT_TECHNOLOGY_MIRACAST \
+		? L&quot;MIRACAST&quot; \
+		: tech == DISPLAYCONFIG_OUTPUT_TECHNOLOGY_INTERNAL \
+		? L&quot;INTERNAL&quot; \
+		: tech == DISPLAYCONFIG_OUTPUT_TECHNOLOGY_FORCE_UINT32 \
+		? L&quot;FORCE_UINT32&quot; \
+		: tech == DISPLAYCONFIG_OUTPUT_TECHNOLOGY_OTHER \
+		? L&quot;OTHER&quot; \
+		: L&quot;Error&quot;
+
+#define PATH_INFO_MFT L&quot;PATH==&gt; \t idx:%d \t active:%d \t width:%d \t height:%d \n&quot; \
+		L&quot;\t\t srcDevName:%s \t moitName:%s \t signal:%s \n&quot; \
+		L&quot;\t\t srcId:0x%08x \t srcAdpId:0x%08x \t srcModeIdx:%d \n&quot; \
+		L&quot;\t\t dstId:0x%08x \t dstAdpId:0x%08x \t dstModeIdx:%d \n&quot; \
+		L&quot;moitDevPath:%s \r\n\n&quot;
+
+#define SHOW_PATH_INFO(i, infoEx) WLOG(PATH_INFO_MFT \
+		, i \
+		, infoEx.path.flags &amp; DISPLAYCONFIG_PATH_ACTIVE \
+		, infoEx.ex.dstWidth \
+		, infoEx.ex.dstHeight \
+		, infoEx.ex.srcDevName \
+		, infoEx.ex.dstMonitorName \
+		, PATH_TECH(infoEx.path.targetInfo.outputTechnology) \
+		, infoEx.path.sourceInfo.id \
+		, infoEx.path.sourceInfo.adapterId.LowPart \
+		, infoEx.path.sourceInfo.modeInfoIdx \
+		, infoEx.path.targetInfo.id \
+		, infoEx.path.targetInfo.adapterId.LowPart \
+		, infoEx.path.targetInfo.modeInfoIdx \
+		, infoEx.ex.dstMonitorPath \
+		)
+
+void WDDM::ShowSettingInfo(DISPLAYCONFIG_SETTING_INFO&amp; setInfo
+    , std::vector&lt;DISPLAYCONFIG_PATH_INFO_EX&gt;&amp; infoExVec)
+{
+    if (setInfo.modePtr &amp;&amp; setInfo.modeCount)
+        for (size_t i = 0; i &lt; setInfo.modeCount; i++)
+        {
+            const DISPLAYCONFIG_MODE_INFO&amp; modeRef = setInfo.modePtr.get()[i];
+            SHOW_MODE_INFO(i, modeRef);
+        }
+
+    LOG(&quot;\n&quot;);
+
+    int validCount = infoExVec.size();
+    if (validCount &gt; 0)
+        for (size_t i = 0; i &lt; validCount; i++)
+        {
+            const DISPLAYCONFIG_PATH_INFO_EX&amp; infoEx = infoExVec[i];
+            SHOW_PATH_INFO(i, infoEx);
+        }
+}
+</code></pre>
+<p>  此时扩展数据的获取和打印环境以准备完成，对此我们将这些扩展信息打印出来。</p>
+<pre><code class="language-c++">DISPLAYCONFIG_SETTING_INFO setInfo{};
+if (WDDM::GetPathModeInfo(setInfo, true))
+{
+    std::vector&lt;DISPLAYCONFIG_PATH_INFO_EX&gt; infoExVec;
+    if (setInfo.pathPtr &amp;&amp; setInfo.pathCount)
+        for (int i = 0; i &lt; setInfo.pathCount; i++)
+        {
+            const DISPLAYCONFIG_PATH_INFO&amp; infoRef = setInfo.pathPtr.get()[i];
+            DISPLAYCONFIG_PATH_INFO_EX infoEx{ infoRef };
+
+            bool isDefault = false;
+            if (WDDM::FillInfoEx(setInfo, infoEx, isDefault))
+                infoExVec.push_back(infoEx);
+        }
+
+    WDDM::ShowSettingInfo(setInfo, infoExVec);
+}
+</code></pre>
+<p>  到此时我们可以得到如下的调试信息，将帮助我理解 <code>PATH</code> 和 <code>MODE</code> 的相互关系，需要注意的是在 <strong><code>FillInfoEx</code></strong> 阶段已经过滤了无效的项目。</p>
+<pre><code>MODE==&gt;          idx:0   id:0x03060300   adpId:0x0000b808        type:target     x:  -1  y:  -1
+MODE==&gt;          idx:1   id:0x00000000   adpId:0x0000b808        type:source     x:1920  y:   0
+MODE==&gt;          idx:2   id:0x01010100   adpId:0x0000b808        type:target     x:  -1  y:  -1
+MODE==&gt;          idx:3   id:0x00000001   adpId:0x0000b808        type:source     x:   0  y:   0
+
+PATH==&gt;          idx:0   active:1        width:1920      height:1080
+srcDevName:\\.\DISPLAY1         moitName:3DTV   signal:HDMI
+srcId:0x00000000        srcAdpId:0x0000b808     srcModeIdx:1
+dstId:0x03060300        dstAdpId:0x0000b808     dstModeIdx:0
+moitDevPath:\\?\DISPLAY#TCL0000#4&amp;35aefc14&amp;0&amp;UID50725632#{e6f07b5f-ee97-4a90-b076-33f57bf4eaa7}
+
+PATH==&gt;          idx:1   active:1        width:1920      height:1080
+srcDevName:\\.\DISPLAY2         moitName:H220   signal:VGA
+srcId:0x00000001        srcAdpId:0x0000b808     srcModeIdx:3
+dstId:0x01010100        dstAdpId:0x0000b808     dstModeIdx:2
+moitDevPath:\\?\DISPLAY#HKC21A6#4&amp;35aefc14&amp;0&amp;UID16843008#{e6f07b5f-ee97-4a90-b076-33f57bf4eaa7}
+
+PATH==&gt;          idx:2   active:0        width:1920      height:1080
+srcDevName:\\.\DISPLAY1         moitName:H220   signal:VGA
+srcId:0x00000000        srcAdpId:0x0000b808     srcModeIdx:1
+dstId:0x01010100        dstAdpId:0x0000b808     dstModeIdx:2
+moitDevPath:\\?\DISPLAY#HKC21A6#4&amp;35aefc14&amp;0&amp;UID16843008#{e6f07b5f-ee97-4a90-b076-33f57bf4eaa7}
+
+PATH==&gt;          idx:3   active:0        width:1920      height:1080
+srcDevName:\\.\DISPLAY3         moitName:H220   signal:VGA
+srcId:0x00000002        srcAdpId:0x0000b808     srcModeIdx:-1
+dstId:0x01010100        dstAdpId:0x0000b808     dstModeIdx:2
+moitDevPath:\\?\DISPLAY#HKC21A6#4&amp;35aefc14&amp;0&amp;UID16843008#{e6f07b5f-ee97-4a90-b076-33f57bf4eaa7}
+
+PATH==&gt;          idx:4   active:0        width:1920      height:1080
+srcDevName:\\.\DISPLAY2         moitName:3DTV   signal:HDMI
+srcId:0x00000001        srcAdpId:0x0000b808     srcModeIdx:3
+dstId:0x03060300        dstAdpId:0x0000b808     dstModeIdx:0
+moitDevPath:\\?\DISPLAY#TCL0000#4&amp;35aefc14&amp;0&amp;UID50725632#{e6f07b5f-ee97-4a90-b076-33f57bf4eaa7}
+
+PATH==&gt;          idx:5   active:0        width:1920      height:1080
+srcDevName:\\.\DISPLAY3         moitName:3DTV   signal:HDMI
+srcId:0x00000002        srcAdpId:0x0000b808     srcModeIdx:-1
+dstId:0x03060300        dstAdpId:0x0000b808     dstModeIdx:0
+moitDevPath:\\?\DISPLAY#TCL0000#4&amp;35aefc14&amp;0&amp;UID50725632#{e6f07b5f-ee97-4a90-b076-33f57bf4eaa7}
+</code></pre>
+<p>  基于以上的调试信息我们可以知道下面这些有用的规律信息：</p>
+<ul>
+<li>
+<p>在同一适配器（<em><strong>dstAdpId</strong></em>）上的不同监视器（<em><strong>moitDevPath</strong></em>）可被安排到不同编号（<em><strong>srcDevName</strong></em>）上。如果将过滤掉的数据全部打印出来，则会发现所有的 <code>PATH</code> 其实是对适配器、编号、监视器这三者的穷举排列。</p>
+</li>
+<li>
+<p>在 <code>PATH</code> 的打印中 <em><strong>srcId</strong></em>、 <em><strong>srcModeIdx</strong></em>、<em><strong>dstId</strong></em>、 <em><strong>dstModeIdx</strong></em> 均对于与 <code>MODE</code>打印中的 <em><strong>id</strong></em> 和 <em><strong>idx</strong></em>，其中 <em><strong>idx</strong></em> （数组索引的简写）不存在时用 <strong>“-1”</strong> 代替。同时该条路径是否处于激活由 <code>DISPLAYCONFIG_PATH_INFO</code> 中的  <em><strong>flags</strong></em> 是否设置 <em><strong>DISPLAYCONFIG_PATH_ACTIVE</strong></em> 确定。在某些工控类主板中，可能出现打印的 <em><strong>signal</strong></em> 不是你实际硬件的类型，比如打印为 <em><strong>DISPLAYPORT_EXTERNAL</strong></em> 但实际硬件接口却是 <em><strong>VGA</strong></em>，出现这种情况一般是主板使用显示信号转换芯片。</p>
+</li>
+<li>
+<p>在 <code>MODE</code> 的打印中 <em><strong>target</strong></em> 在前 <em><strong>source</strong></em> 在后。</p>
+</li>
+</ul>
+<p>  到此时基本关系已经明确，将一个监视器 <em><strong>moitDevPath</strong></em> 绑定在编号 <em><strong>srcDevName</strong></em> 上。设置需要的分辨率到 <em><strong>srcMode</strong></em> 并将其连接到 <em><strong>dstMode</strong></em>，由此构建一条完整的 <code>PATH</code> ，两者之间的关系可做下图说明：</p>
+<div class="mermaid" style="text-align:center">
+flowchart LR
+    subgraph MODE array
+    dstMode1[idx:0 target mode1]
+    srcMode1[idx:1 source mode1]
+    dstMode2[idx:2 target mode2]
+    srcMode2[idx:3 source mode2]
+    end
+    subgraph PATH array
+    path1[idx:0 path1]
+    path2[idx:1 path2]
+    end
+    dstMode1 -->|dstModeIdx| path1
+    srcMode1 -->|srcModeIdx| path1
+    dstMode2 -->|dstModeIdx| path2
+    srcMode2 -->|srcModeIdx| path2
+</div>
+<p>  为此要自定义显示模式则只需要构建一个满足上方规则的 <code>MODE</code> 数组和 <code>PATH</code> 数组。将其传递给传递给 <code>SetDisplayConfig</code> 执行设置，不要忘了给 <code>PATH</code> 的 <em><strong>flags</strong></em> 设定 <em><strong>DISPLAYCONFIG_PATH_ACTIVE</strong></em> 激活，该接口函数如果需要立即生效则需要注意使用以下参数搭配：</p>
+<pre><code class="language-c++">bool SetSettingInfo(const DISPLAYCONFIG_SETTING_INFO &amp;setInfo)
+{
+	// SetDisplayConfig 要求程序是桌面程序，拥有访问控制台会话或桌面否者将其返回 ERROR_ACCESS_DENIED
+	return SetDisplayConfig(setInfo.pathCount
+		, setInfo.pathPtr.get()
+		, setInfo.modeCount
+		, setInfo.modePtr.get()
+		, SDC_USE_SUPPLIED_DISPLAY_CONFIG | SDC_APPLY | SDC_SAVE_TO_DATABASE | SDC_ALLOW_CHANGES | SDC_FORCE_MODE_ENUMERATION
+		) == ERROR_SUCCESS;
+}
+</code></pre>
+<h2 id="2-如何定制显示模式">2、 如何定制显示模式</h2>
+<p>  定制显示模式主要在于对 <code>DISPLAYCONFIG_MODE_INFO</code>中的<code>sourceMode</code>的合理设置。</p>
+<h3 id="21-单主屏幕显示">2.1 单主屏幕显示</h3>
+<p>  实现单主屏显示效果，则我们值需要构建一条 <strong>PATH</strong> 即可。由于单屏显示不需要设置如扩展或者复制模式，则我应该将其 <code>PATH</code> 对应的<code>DISPLAYCONFIG_MODE_INFO</code>中的 <em><strong>sourceMode</strong></em> 下的 <em><strong>position</strong></em> 重置为“<em><strong>0,0</strong></em>”。</p>
+<h3 id="22-双屏显示如何设置">2.2 双屏显示如何设置</h3>
+<p>  在多屏幕模式下主要有复制和扩展这两种模式，这两种模式设置方法一样，单使用的配置参数不一致，两种模式都有自己的强制要求。</p>
+<h4 id="221-复制模式">2.2.1 复制模式</h4>
+<p>  要构建一个复制模式则可先分析复制模式的显示特点，两个屏幕会显示<strong>一样的分辨率、显示位置</strong>。在一个外接两块屏幕的系统中设置复制模式，则在构建这<strong>两条</strong> <code>PATH</code> 时，每一条 <code>PATH</code> 对应的<code>DISPLAYCONFIG_MODE_INFO</code>中的 <em><strong>sourceMode</strong></em> 下的 <em><strong>position</strong></em> 一定要都为“<em><strong>0,0</strong></em>”。其主要伪代码操作如下：</p>
+<pre><code class="language-c++">srcModeInfo1.sourceMode.width = 1366;
+srcModeInfo1.sourceMode.height = 768;
+srcModeInfo1.sourceMode.position.x = 0;
+srcModeInfo1.sourceMode.position.y = 0;
+...
+srcModeInfo2.sourceMode.width = 1366;
+srcModeInfo2.sourceMode.height = 768;
+srcModeInfo2.sourceMode.position.x = 0;
+srcModeInfo2.sourceMode.position.y = 0;
+</code></pre>
+<h4 id="221-扩展模式">2.2.1 扩展模式</h4>
+<p>  扩展模式相对自由度更高，每个显示器可以自定义的自己的分辨率和显示位置。但扩展模式有一个硬性要求就是<strong>两条路径形成的矩形的之间不能有缝隙</strong>，两个矩形至少有一个共同的边，否则将会设置无效。该规则基于Window系统分辨以屏幕左上角为原点，以主屏幕左上角 <em><strong>0,0</strong></em> 为参考。</p>
+<div class="mermaid" style="text-align:center">
+flowchart LR
+L[-1366,0] --- M[0,0] --- R[1920,0]
+</div>
+<p>  基于横向的排列规则，将屏幕2放置在主屏幕左側则可以有如下伪代码：</p>
+<pre><code class="language-c++">srcModeInfo1.sourceMode.width = 1920;
+srcModeInfo1.sourceMode.height = 1080;
+srcModeInfo1.sourceMode.position.x = 0;
+srcModeInfo1.sourceMode.position.y = 0;
+...
+srcModeInfo2.sourceMode.width = 1366;
+srcModeInfo2.sourceMode.height = 768;
+srcModeInfo2.sourceMode.position.x = -1366;
+srcModeInfo2.sourceMode.position.y = 0;
+</code></pre>
+<div class="mermaid" style="text-align:center">
+flowchart TB
+A[0,-768]  --- C[0,0] --- B[0,1080]
+</div>
+<p>  基于竖向的排列规则，将屏幕2放置在主屏幕上側则可以有如下伪代码：</p>
+<pre><code class="language-c++">srcModeInfo1.sourceMode.width = 1920;
+srcModeInfo1.sourceMode.height = 1080;
+srcModeInfo1.sourceMode.position.x = 0;
+srcModeInfo1.sourceMode.position.y = 0;
+...
+srcModeInfo2.sourceMode.width = 1366;
+srcModeInfo2.sourceMode.height = 768;
+srcModeInfo2.sourceMode.position.x = 0;
+srcModeInfo2.sourceMode.position.y = -768;
+</code></pre>
+<p>  有一个特例是斜角45°排列，则两矩形的两个顶点相靠，将屏幕2放置在主屏幕左上斜角45°位置则可以有如下伪代码：</p>
+<pre><code class="language-c++">srcModeInfo1.sourceMode.width = 1920;
+srcModeInfo1.sourceMode.height = 1080;
+srcModeInfo1.sourceMode.position.x = 0;
+srcModeInfo1.sourceMode.position.y = 0;
+...
+srcModeInfo2.sourceMode.width = 1366;
+srcModeInfo2.sourceMode.height = 768;
+srcModeInfo2.sourceMode.position.x = -1366;
+srcModeInfo2.sourceMode.position.y = -768;
+</code></pre>
+
+                </div>
+            </article>
+        </div>
+
+        
+            <div class="next-post">
+                <div class="next gt-c-content-color-first">下一篇</div>
+                <a href="https://yjulm.com/post/tech-doc-overview/" class="post-title gt-a-link">
+                    职业生涯之技术总结大纲
+                </a>
+            </div>
+        
+
+        
+            <div id="/post/custom-display-mode/" class="leancloud_visitors" style="visibility:collapse" data-flag-title="自定义显示器的显示模式原理和实现">
+            	当前文章阅读量为 <span id="/post/custom-display-mode/" class="waline-pageview-count leancloud-visitors-count">0</span> 次
+            </div>
+        
+
+        
+
+        
+            <link href='https://fastly.jsdelivr.net/npm/@waline/client@v2/dist/waline.css' rel='stylesheet' />
+<script src='https://fastly.jsdelivr.net/npm/@waline/client@v2/dist/waline.js'></script>
+
+<style>
+	div#waline{
+		width:100%;
+		max-width: 1000px;
+		padding: 2.5%;
+	}
+	
+	span.katex { font-size: 20px; }
+	
+	.wl-emoji-popup { font-size: 16px !important; }
+	.wl-emoji-popup button { height: 2em; }
+</style>
+
+
+	<div id="waline"></div>
+
+<script>
+	Waline.init({
+		el: '#waline',
+		login: 'enable',
+		imageUploader: false,
+		search: false,
+		serverURL: 'https://waline-vercel.yjulm.com/',
+		pageSize: 10,
+		recordIp: true,
+		pageview: true,
+		commentSorting: 'hottest',
+		emoji: [
+				'//fastly.jsdelivr.net/npm/@waline/emojis/qq',
+				'//fastly.jsdelivr.net/npm/@waline/emojis/tw-emoji'
+		],
+		highlighter: function(code, lang) {
+			return hljs.highlight(code, {language: lang}).value;
+		},
+		texRenderer: function(blockMode, tex) {
+			var str = katex.renderToString(tex, {
+				displayMode: blockMode,
+				throwOnError: false,
+			});
+			return str;
+		}
+	});
+</script>
+
+        
+
+        <div class="site-footer gt-c-content-color-first">
+    <div class="slogan gt-c-content-color-first"></div>
+    <div class="social-container">
+        
+            
+                <a href="https://github.com/yjulm" target="_blank">
+                    <i class="fab fa-github gt-c-content-color-first"></i>
+                </a>
+            
+        
+            
+        
+            
+                <a href="https://weibo.com/yjulm" target="_blank">
+                    <i class="fab fa-weibo gt-c-content-color-first"></i>
+                </a>
+            
+        
+            
+                <a href="https://www.zhihu.com/people/yjulm" target="_blank">
+                    <i class="fab fa-zhihu gt-c-content-color-first"></i>
+                </a>
+            
+        
+            
+        
+            
+        
+    </div>
+    <div class="footer-info">
+        <div><p>平生知心者，屈指能有几。</p></div>
+    </div>
+    <div>
+        Theme by <a href="https://imhanjie.com/" target="_blank">imhanjie</a>, Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a>, <a href="https://yjulm.com/atom.xml" target="_blank">RSS</a>
+    </div>
+</div>
+
+        <script>
+  hljs.highlightAll();
+</script>
+
+        <script>
+(function() {
+	function addEventListener(element, type, handler) {
+        if (element.addEventListener) {
+            element.addEventListener(type, handler, false);
+        } else if (element.attachEvent) {
+            element.attachEvent('on' + type, handler);
+        }
+    }
+
+    addEventListener(window, 'load', function () {
+        var Viewer = window.Viewer;
+        var pictures = document.querySelector('.post-content');
+        var viewer = new Viewer(pictures);
+    });
+})();
+</script>
+
+
+        <script>
+            var ele = document.querySelector(".waline-pageview-count");
+            Object.defineProperty(ele, 'innerText', {
+                get: function() {
+                    return ele.innerText;
+                },
+                set: function(value) {
+                    ele.innerHTML = value;
+                    if (value > 0) {
+	                    var parent = document.querySelector(".leancloud_visitors");
+	                    parent.style.visibility="visible";
+	                }
+                }
+            });
+        </script>
+    </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,331 @@
+<html lang="zh">
+<head>
+    <meta charset="utf-8" />
+<meta name="description" content="" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+<title>WPF程序在触摸失效时的解决方案 | Yjulm</title>
+
+<link rel="shortcut icon" href="https://yjulm.com/favicon.ico?v=1670599107006">
+
+<link href="https://fastly.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://yjulm.com/styles/main.css">
+
+<!-- <link rel="stylesheet" href="https://fastly.jsdelivr.net/npm/bootstrap@4.5.0/dist/css/bootstrap.min.css"> -->
+<!-- <script src="https://fastly.jsdelivr.net/npm/moment@2.27.0/moment.min.js"></script> -->
+<!-- <script src="https://fastly.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js"></script> -->
+<!-- <script src="https://fastly.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"></script> -->
+<!-- <script src="https://fastly.jsdelivr.net/npm/bootstrap@4.5.0/dist/js/bootstrap.min.js"></script> -->
+<!-- DEMO JS -->
+<!--<script src="media/scripts/index.js"></script>-->
+
+
+
+    
+<link rel="stylesheet" href="https://fastly.jsdelivr.net/gh/highlightjs/cdn-release@11.3.1/build/styles/base16/solarized-light.min.css">
+
+<script src="https://fastly.jsdelivr.net/combine/gh/highlightjs/cdn-release@11.3.1/build/highlight.min.js,gh/highlightjs/cdn-release@11.3.1/build/languages/cpp.min.js,gh/highlightjs/cdn-release@11.3.1/build/languages/csharp.min.js,gh/highlightjs/cdn-release@11.3.1/build/languages/c.min.js,gh/highlightjs/cdn-release@11.3.1/build/languages/python.min.js,gh/highlightjs/cdn-release@11.3.1/build/languages/rust.min.js,gh/highlightjs/cdn-release@11.3.1/build/languages/xml.min.js,gh/highlightjs/cdn-release@11.3.1/build/languages/javascript.min.js,gh/highlightjs/cdn-release@11.3.1/build/languages/powershell.min.js,gh/highlightjs/cdn-release@11.3.1/build/languages/shell.min.js,gh/highlightjs/cdn-release@11.3.1/build/languages/sql.min.js,gh/highlightjs/cdn-release@11.3.1/build/languages/http.min.js,gh/highlightjs/cdn-release@11.3.1/build/languages/go.min.js,gh/highlightjs/cdn-release@11.3.1/build/languages/css.min.js"></script>
+
+<!-- <script src="https://fastly.jsdelivr.net/gh/highlightjs/cdn-release@11.3.1/build/highlight.min.js"></script>
+<script src="https://fastly.jsdelivr.net/gh/highlightjs/cdn-release@11.3.1/build/languages/cpp.min.js"></script>
+<script src="https://fastly.jsdelivr.net/gh/highlightjs/cdn-release@11.3.1/build/languages/csharp.min.js"></script>
+<script src="https://fastly.jsdelivr.net/gh/highlightjs/cdn-release@11.3.1/build/languages/c.min.js"></script>
+<script src="https://fastly.jsdelivr.net/gh/highlightjs/cdn-release@11.3.1/build/languages/python.min.js"></script>
+<script src="https://fastly.jsdelivr.net/gh/highlightjs/cdn-release@11.3.1/build/languages/rust.min.js"></script>
+<script src="https://fastly.jsdelivr.net/gh/highlightjs/cdn-release@11.3.1/build/languages/xml.min.js"></script>
+<script src="https://fastly.jsdelivr.net/gh/highlightjs/cdn-release@11.3.1/build/languages/javascript.min.js"></script>
+<script src="https://fastly.jsdelivr.net/gh/highlightjs/cdn-release@11.3.1/build/languages/powershell.min.js"></script>
+<script src="https://fastly.jsdelivr.net/gh/highlightjs/cdn-release@11.3.1/build/languages/shell.min.js"></script>
+<script src="https://fastly.jsdelivr.net/gh/highlightjs/cdn-release@11.3.1/build/languages/sql.min.js"></script>
+<script src="https://fastly.jsdelivr.net/gh/highlightjs/cdn-release@11.3.1/build/languages/http.min.js"></script>
+<script src="https://fastly.jsdelivr.net/gh/highlightjs/cdn-release@11.3.1/build/languages/go.min.js"></script>
+<script src="https://fastly.jsdelivr.net/gh/highlightjs/cdn-release@11.3.1/build/languages/css.min.js"></script>
+ -->
+
+    <script src="https://fastly.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+<script>mermaid.initialize({startOnLoad:true});</script>
+
+    <link rel="stylesheet" href="https://fastly.jsdelivr.net/npm/viewerjs@1.10.2/dist/viewer.min.css" />
+<script src="https://fastly.jsdelivr.net/npm/viewerjs@1.10.2/dist/viewer.min.js"></script>
+
+    <link rel="stylesheet" href="https://fastly.jsdelivr.net/npm/katex@0.16.4/dist/katex.min.css">
+    <script src="https://fastly.jsdelivr.net/npm/katex@0.16.4/dist/katex.min.js"></script>
+    <script src="https://fastly.jsdelivr.net/npm/katex@0.16.4/dist/contrib/auto-render.min.js"></script>
+</head>
+<body>
+<div class="main gt-bg-theme-color-first">
+    <nav class="navbar navbar-expand-lg">
+    <a class="navbar-brand" href="/">
+        <img class="user-avatar" src="/images/avatar.png" alt="头像">
+        <div class="site-name gt-c-content-color-first">
+            Yjulm
+        </div>
+    </a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+        aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation" id="changeNavbar">
+        <i class="fas fa-bars gt-c-content-color-first" style="font-size: 18px"></i>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <div class="navbar-nav mr-auto" style="text-align: center">
+            
+            <div class="nav-item">
+                
+                <a href="/" class="menu gt-a-link">
+                    首页
+                </a>
+                
+            </div>
+            
+            <div class="nav-item">
+                
+                <a href="/archives" class="menu gt-a-link">
+                    归档
+                </a>
+                
+            </div>
+            
+            <div class="nav-item">
+                
+                <a href="/tags" class="menu gt-a-link">
+                    标签
+                </a>
+                
+            </div>
+            
+            <div class="nav-item">
+                
+                <a href="/post/about" class="menu gt-a-link">
+                    关于
+                </a>
+                
+            </div>
+            
+        </div>
+        <div style="text-align: center">
+            <form id="gridea-search-form" style="position: relative" data-update="1670599107006"
+                action="/search/">
+                <input class="search-input" autocomplete="off" spellcheck="false" name="q" placeholder="搜索文章" />
+                <i class="fas fa-search gt-c-content-color-first" style="position: absolute; top: 9px; left: 10px;"></i>
+            </form>
+        </div>
+    </div>
+</nav>
+<script>
+    /* 移动端导航栏展开/收起切换 */
+    document.getElementById('changeNavbar').onclick = function () {
+        var element = document.getElementById('navbarSupportedContent');
+        if (element.style.display === 'none' || element.style.display === '') {
+            element.style.display = 'block';
+        } else {
+            element.style.display = 'none';
+        }
+    }
+</script>
+
+    <div class="post-container">
+        <div class="post-detail gt-bg-theme-color-second">
+            <article class="gt-post-content">
+                <h2 class="post-title">
+                    WPF程序在触摸失效时的解决方案
+                </h2>
+                <div class="post-info">
+                    <time class="post-time gt-c-content-color-first">
+                        · 2021-12-15 ·
+                    </time>
+                    
+                        <a href="https://yjulm.com/tag/touch/" class="post-tags">
+                            # Touch
+                        </a>
+                    
+                        <a href="https://yjulm.com/tag/wpf/" class="post-tags">
+                            # WPF
+                        </a>
+                    
+                </div>
+                <div class="post-content">
+                    <p>  在使用触摸屏幕的系统中，当WPF程序在创建并<code>Show</code>窗口的时候，如果窗口的加载过程中有高负荷的CPU使用操作（在性能低下的主机中尤为如此），则窗口在显示完成后有一定几率会触摸失效。其表现为任何触摸的操作都没有反应，但鼠标可以正常的操作，这种情况也会在触摸屏硬件断开并重新连接后出现。</p>
+<p>  失效的这一现象只出现在你的程序中，而其他程序或者系统程序则触摸正常。此问题是属于 <strong>.NET Framework</strong> 的底层的缺陷，且这一问题直到微软推出了最后的版本4.8也没有解决。要处理这一问题，可以在加载窗口的过程中尽量少做操作，将操作放到窗口加载后来执行，但这只是降低出现的概率并不能根治。</p>
+<h1 id="一-降级修复方案">一、 降级修复方案</h1>
+<p>  针对此问题有一个较为可靠的降级修复方案，停用运行时框架自带的手写笔支持，将触控输入切换到普通多点触控模式，并手动构建触摸消息，由此来达到偷梁换柱的操作。该操作的实现原理来源于官方的文档介绍，<strong><a href="https://docs.microsoft.com/en-us/dotnet/desktop/wpf/advanced/disable-the-realtimestylus-for-wpf-applications?view=netframeworkdesktop-4.8">为 WPF 应用程序禁用 RealTimeStylus</a></strong>。该文档有描述：</p>
+<blockquote>
+<p>Windows Presentation Foundation (WPF) 内置了对处理 Windows 7 触摸输入的支持。这种支持来自平板电脑平台的实时触笔输入，如OnStylusDown、OnStylusUp和OnStylusMove事件。Windows 7 还提供多点触控输入作为 Win32 WM_TOUCH 窗口消息。这两个 API 在同一个 HWND 上是互斥的。通过平板电脑平台启用触摸输入（WPF 应用程序的默认设置）会禁用 WM_TOUCH 消息。因此，要使用 WM_TOUCH 从 WPF 窗口接收触摸消息，您必须禁用 WPF 中的内置触控笔支持。这适用于托管使用 WM_TOUCH 的组件的 WPF 窗口等场景。</p>
+</blockquote>
+<h2 id="1-禁用手写笔支持">1、 禁用手写笔支持</h2>
+<p>  前方的文档给出了说明并同时给出了示例代码，使用其反射来禁用默认的触笔支持。</p>
+<pre><code class="language-c#">public static void DisableWPFTabletSupport()  
+{  
+    // Get a collection of the tablet devices for this window.
+    TabletDeviceCollection devices = System.Windows.Input.Tablet.TabletDevices;  
+  
+    if (devices.Count &gt; 0)  
+    {
+        // Get the Type of InputManager.  
+        Type inputManagerType = typeof(System.Windows.Input.InputManager);  
+  
+        // Call the StylusLogic method on the InputManager.Current instance.  
+        object stylusLogic = inputManagerType.InvokeMember(&quot;StylusLogic&quot;,  
+                    BindingFlags.GetProperty | BindingFlags.Instance | BindingFlags.NonPublic,  
+                    null, InputManager.Current, null);  
+  
+        if (stylusLogic != null)  
+        {  
+            //  Get the type of the stylusLogic returned from the call to StylusLogic.  
+            Type stylusLogicType = stylusLogic.GetType();  
+  
+            // Loop until there are no more devices to remove.  
+            while (devices.Count &gt; 0)  
+            {  
+                // Remove the first tablet device in the devices collection.  
+                stylusLogicType.InvokeMember(&quot;OnTabletRemoved&quot;,  
+                        BindingFlags.InvokeMethod | BindingFlags.Instance | BindingFlags.NonPublic,  
+                        null, stylusLogic, new object[] { (uint)0 });  
+            }
+        }  
+    }  
+}
+</code></pre>
+<p>  在经过以上的操作后，运行时默认的手写笔支持已经被禁用，同时触摸层也受到该操作影响。</p>
+
+                </div>
+            </article>
+        </div>
+
+        
+
+        
+            <div id="/post/fix-wpf-touch-screen-invalid/" class="leancloud_visitors" style="visibility:collapse" data-flag-title="WPF程序在触摸失效时的解决方案">
+            	当前文章阅读量为 <span id="/post/fix-wpf-touch-screen-invalid/" class="waline-pageview-count leancloud-visitors-count">0</span> 次
+            </div>
+        
+
+        
+
+        
+            <link href='https://fastly.jsdelivr.net/npm/@waline/client@v2/dist/waline.css' rel='stylesheet' />
+<script src='https://fastly.jsdelivr.net/npm/@waline/client@v2/dist/waline.js'></script>
+
+<style>
+	div#waline{
+		width:100%;
+		max-width: 1000px;
+		padding: 2.5%;
+	}
+	
+	span.katex { font-size: 20px; }
+	
+	.wl-emoji-popup { font-size: 16px !important; }
+	.wl-emoji-popup button { height: 2em; }
+</style>
+
+
+	<div id="waline"></div>
+
+<script>
+	Waline.init({
+		el: '#waline',
+		login: 'enable',
+		imageUploader: false,
+		search: false,
+		serverURL: 'https://waline-vercel.yjulm.com/',
+		pageSize: 10,
+		recordIp: true,
+		pageview: true,
+		commentSorting: 'hottest',
+		emoji: [
+				'//fastly.jsdelivr.net/npm/@waline/emojis/qq',
+				'//fastly.jsdelivr.net/npm/@waline/emojis/tw-emoji'
+		],
+		highlighter: function(code, lang) {
+			return hljs.highlight(code, {language: lang}).value;
+		},
+		texRenderer: function(blockMode, tex) {
+			var str = katex.renderToString(tex, {
+				displayMode: blockMode,
+				throwOnError: false,
+			});
+			return str;
+		}
+	});
+</script>
+
+        
+
+        <div class="site-footer gt-c-content-color-first">
+    <div class="slogan gt-c-content-color-first"></div>
+    <div class="social-container">
+        
+            
+                <a href="https://github.com/yjulm" target="_blank">
+                    <i class="fab fa-github gt-c-content-color-first"></i>
+                </a>
+            
+        
+            
+        
+            
+                <a href="https://weibo.com/yjulm" target="_blank">
+                    <i class="fab fa-weibo gt-c-content-color-first"></i>
+                </a>
+            
+        
+            
+                <a href="https://www.zhihu.com/people/yjulm" target="_blank">
+                    <i class="fab fa-zhihu gt-c-content-color-first"></i>
+                </a>
+            
+        
+            
+        
+            
+        
+    </div>
+    <div class="footer-info">
+        <div><p>平生知心者，屈指能有几。</p></div>
+    </div>
+    <div>
+        Theme by <a href="https://imhanjie.com/" target="_blank">imhanjie</a>, Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a>, <a href="https://yjulm.com/atom.xml" target="_blank">RSS</a>
+    </div>
+</div>
+
+        <script>
+  hljs.highlightAll();
+</script>
+
+        <script>
+(function() {
+	function addEventListener(element, type, handler) {
+        if (element.addEventListener) {
+            element.addEventListener(type, handler, false);
+        } else if (element.attachEvent) {
+            element.attachEvent('on' + type, handler);
+        }
+    }
+
+    addEventListener(window, 'load', function () {
+        var Viewer = window.Viewer;
+        var pictures = document.querySelector('.post-content');
+        var viewer = new Viewer(pictures);
+    });
+})();
+</script>
+
+
+        <script>
+            var ele = document.querySelector(".waline-pageview-count");
+            Object.defineProperty(ele, 'innerText', {
+                get: function() {
+                    return ele.innerText;
+                },
+                set: function(value) {
+                    ele.innerHTML = value;
+                    if (value > 0) {
+	                    var parent = document.querySelector(".leancloud_visitors");
+	                    parent.style.visibility="visible";
+	                }
+                }
+            });
+        </script>
+    </div>
+</div>
+</body>
+</html>

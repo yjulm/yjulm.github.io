@@ -1,0 +1,364 @@
+<html lang="zh">
+<head>
+    <meta charset="utf-8" />
+<meta name="description" content="" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+<title>职业生涯之技术总结大纲 | Yjulm</title>
+
+<link rel="shortcut icon" href="https://yjulm.com/favicon.ico?v=1670599107006">
+
+<link href="https://fastly.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://yjulm.com/styles/main.css">
+
+<!-- <link rel="stylesheet" href="https://fastly.jsdelivr.net/npm/bootstrap@4.5.0/dist/css/bootstrap.min.css"> -->
+<!-- <script src="https://fastly.jsdelivr.net/npm/moment@2.27.0/moment.min.js"></script> -->
+<!-- <script src="https://fastly.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js"></script> -->
+<!-- <script src="https://fastly.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"></script> -->
+<!-- <script src="https://fastly.jsdelivr.net/npm/bootstrap@4.5.0/dist/js/bootstrap.min.js"></script> -->
+<!-- DEMO JS -->
+<!--<script src="media/scripts/index.js"></script>-->
+
+
+
+    
+<link rel="stylesheet" href="https://fastly.jsdelivr.net/gh/highlightjs/cdn-release@11.3.1/build/styles/base16/solarized-light.min.css">
+
+<script src="https://fastly.jsdelivr.net/combine/gh/highlightjs/cdn-release@11.3.1/build/highlight.min.js,gh/highlightjs/cdn-release@11.3.1/build/languages/cpp.min.js,gh/highlightjs/cdn-release@11.3.1/build/languages/csharp.min.js,gh/highlightjs/cdn-release@11.3.1/build/languages/c.min.js,gh/highlightjs/cdn-release@11.3.1/build/languages/python.min.js,gh/highlightjs/cdn-release@11.3.1/build/languages/rust.min.js,gh/highlightjs/cdn-release@11.3.1/build/languages/xml.min.js,gh/highlightjs/cdn-release@11.3.1/build/languages/javascript.min.js,gh/highlightjs/cdn-release@11.3.1/build/languages/powershell.min.js,gh/highlightjs/cdn-release@11.3.1/build/languages/shell.min.js,gh/highlightjs/cdn-release@11.3.1/build/languages/sql.min.js,gh/highlightjs/cdn-release@11.3.1/build/languages/http.min.js,gh/highlightjs/cdn-release@11.3.1/build/languages/go.min.js,gh/highlightjs/cdn-release@11.3.1/build/languages/css.min.js"></script>
+
+<!-- <script src="https://fastly.jsdelivr.net/gh/highlightjs/cdn-release@11.3.1/build/highlight.min.js"></script>
+<script src="https://fastly.jsdelivr.net/gh/highlightjs/cdn-release@11.3.1/build/languages/cpp.min.js"></script>
+<script src="https://fastly.jsdelivr.net/gh/highlightjs/cdn-release@11.3.1/build/languages/csharp.min.js"></script>
+<script src="https://fastly.jsdelivr.net/gh/highlightjs/cdn-release@11.3.1/build/languages/c.min.js"></script>
+<script src="https://fastly.jsdelivr.net/gh/highlightjs/cdn-release@11.3.1/build/languages/python.min.js"></script>
+<script src="https://fastly.jsdelivr.net/gh/highlightjs/cdn-release@11.3.1/build/languages/rust.min.js"></script>
+<script src="https://fastly.jsdelivr.net/gh/highlightjs/cdn-release@11.3.1/build/languages/xml.min.js"></script>
+<script src="https://fastly.jsdelivr.net/gh/highlightjs/cdn-release@11.3.1/build/languages/javascript.min.js"></script>
+<script src="https://fastly.jsdelivr.net/gh/highlightjs/cdn-release@11.3.1/build/languages/powershell.min.js"></script>
+<script src="https://fastly.jsdelivr.net/gh/highlightjs/cdn-release@11.3.1/build/languages/shell.min.js"></script>
+<script src="https://fastly.jsdelivr.net/gh/highlightjs/cdn-release@11.3.1/build/languages/sql.min.js"></script>
+<script src="https://fastly.jsdelivr.net/gh/highlightjs/cdn-release@11.3.1/build/languages/http.min.js"></script>
+<script src="https://fastly.jsdelivr.net/gh/highlightjs/cdn-release@11.3.1/build/languages/go.min.js"></script>
+<script src="https://fastly.jsdelivr.net/gh/highlightjs/cdn-release@11.3.1/build/languages/css.min.js"></script>
+ -->
+
+    <script src="https://fastly.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+<script>mermaid.initialize({startOnLoad:true});</script>
+
+    <link rel="stylesheet" href="https://fastly.jsdelivr.net/npm/viewerjs@1.10.2/dist/viewer.min.css" />
+<script src="https://fastly.jsdelivr.net/npm/viewerjs@1.10.2/dist/viewer.min.js"></script>
+
+    <link rel="stylesheet" href="https://fastly.jsdelivr.net/npm/katex@0.16.4/dist/katex.min.css">
+    <script src="https://fastly.jsdelivr.net/npm/katex@0.16.4/dist/katex.min.js"></script>
+    <script src="https://fastly.jsdelivr.net/npm/katex@0.16.4/dist/contrib/auto-render.min.js"></script>
+</head>
+<body>
+<div class="main gt-bg-theme-color-first">
+    <nav class="navbar navbar-expand-lg">
+    <a class="navbar-brand" href="/">
+        <img class="user-avatar" src="/images/avatar.png" alt="头像">
+        <div class="site-name gt-c-content-color-first">
+            Yjulm
+        </div>
+    </a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+        aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation" id="changeNavbar">
+        <i class="fas fa-bars gt-c-content-color-first" style="font-size: 18px"></i>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <div class="navbar-nav mr-auto" style="text-align: center">
+            
+            <div class="nav-item">
+                
+                <a href="/" class="menu gt-a-link">
+                    首页
+                </a>
+                
+            </div>
+            
+            <div class="nav-item">
+                
+                <a href="/archives" class="menu gt-a-link">
+                    归档
+                </a>
+                
+            </div>
+            
+            <div class="nav-item">
+                
+                <a href="/tags" class="menu gt-a-link">
+                    标签
+                </a>
+                
+            </div>
+            
+            <div class="nav-item">
+                
+                <a href="/post/about" class="menu gt-a-link">
+                    关于
+                </a>
+                
+            </div>
+            
+        </div>
+        <div style="text-align: center">
+            <form id="gridea-search-form" style="position: relative" data-update="1670599107006"
+                action="/search/">
+                <input class="search-input" autocomplete="off" spellcheck="false" name="q" placeholder="搜索文章" />
+                <i class="fas fa-search gt-c-content-color-first" style="position: absolute; top: 9px; left: 10px;"></i>
+            </form>
+        </div>
+    </div>
+</nav>
+<script>
+    /* 移动端导航栏展开/收起切换 */
+    document.getElementById('changeNavbar').onclick = function () {
+        var element = document.getElementById('navbarSupportedContent');
+        if (element.style.display === 'none' || element.style.display === '') {
+            element.style.display = 'block';
+        } else {
+            element.style.display = 'none';
+        }
+    }
+</script>
+
+    <div class="post-container">
+        <div class="post-detail gt-bg-theme-color-second">
+            <article class="gt-post-content">
+                <h2 class="post-title">
+                    职业生涯之技术总结大纲
+                </h2>
+                <div class="post-info">
+                    <time class="post-time gt-c-content-color-first">
+                        · 2021-11-18 ·
+                    </time>
+                    
+                        <a href="https://yjulm.com/tag/overview/" class="post-tags">
+                            # Overview
+                        </a>
+                    
+                </div>
+                <div class="post-content">
+                    <h1 id="一-软件">一、 软件</h1>
+<hr>
+<h2 id="1-缓冲">1、 缓冲</h2>
+<ol>
+<li>环行缓冲的设计和实现</li>
+<li>环行缓冲的扩展应用之 - 滑动窗口</li>
+<li>大对象OOM之不连续的内存碎片的利用 - 非托管内存流</li>
+<li>大对象OOM之超大分辨率图像的像素解压</li>
+</ol>
+<h2 id="2-设计">2、 设计</h2>
+<ol>
+<li>基于内存映射与信号量的本机大块数据交换与通信</li>
+<li>多线程任务调度器的设计与实现</li>
+<li>利用处理器空闲时间的异步和双线程操作设计</li>
+</ol>
+<h2 id="3-图像">3、 图像</h2>
+<ol>
+<li>索引灰度图的调色板</li>
+<li>图像处理中的通用概念之 - Stride</li>
+<li>BMP文件头与DIB</li>
+<li>纯色背景图的快速剪裁原理和实践</li>
+<li>Brush、ImageSource、Visual 三者之间的互相转化与 UIElement 的离屏渲染</li>
+</ol>
+<h2 id="4-音频">4、 音频</h2>
+<ol>
+<li>PortAudio 的使用方式和范例</li>
+</ol>
+<h2 id="5-视频">5、 视频</h2>
+<ol>
+<li>FFMPEG视频封装之MP4压制</li>
+<li>SDL2的使用方式和范例</li>
+</ol>
+<h2 id="6-网络">6、 网络</h2>
+<ol>
+<li>NAT在网络通信中的影响与穿透</li>
+<li>基于滑动窗口设计的可靠UDP通信协议</li>
+</ol>
+<h1 id="二-硬件">二、 硬件</h1>
+<hr>
+<h2 id="1-touch">1、 TOUCH</h2>
+<ol>
+<li>WPF程序在触摸失效时的解决方案</li>
+</ol>
+<h2 id="2-monitor">2、 MONITOR</h2>
+<ol>
+<li>自定义显示器的显示模式原理和实现</li>
+<li>显示器与触摸屏的一对一绑定原理和解析</li>
+</ol>
+<h2 id="3-iic-smbus-pch">3、 IIC /SMBus /PCH</h2>
+<ol>
+<li>SMBus 和 IIC 协议的基本认识</li>
+<li>南桥芯片PCH的SMBus操作原理和GPIO操控范例</li>
+</ol>
+<h2 id="4-lpcio-ec">4、 LPCIO / EC</h2>
+<ol>
+<li>基于环境控制芯片EC的GPIO操控原理</li>
+</ol>
+<h2 id="5-smbios-dmtf">5、 SMBIOS / DMTF</h2>
+<ol>
+<li>主板软硬件中的DMTF信息获取</li>
+</ol>
+<h2 id="6-pci-pch">6、 PCI /PCH</h2>
+<ol>
+<li>枚举PCI设备的原理</li>
+<li>PCI设备基址的获取原理和范例</li>
+</ol>
+<h1 id="三-其他">三、 其他</h1>
+<hr>
+<ol>
+<li>将最小化和隐藏以及后台的窗口带到前台</li>
+</ol>
+<p  align="right">2021-11-15 拟稿</p>
+
+                </div>
+            </article>
+        </div>
+
+        
+            <div class="next-post">
+                <div class="next gt-c-content-color-first">下一篇</div>
+                <a href="https://yjulm.com/post/activate-minimized-hidden-background-windows/" class="post-title gt-a-link">
+                    将最小化、隐藏、后台的窗口带到前台
+                </a>
+            </div>
+        
+
+        
+            <div id="/post/tech-doc-overview/" class="leancloud_visitors" style="visibility:collapse" data-flag-title="职业生涯之技术总结大纲">
+            	当前文章阅读量为 <span id="/post/tech-doc-overview/" class="waline-pageview-count leancloud-visitors-count">0</span> 次
+            </div>
+        
+
+        
+
+        
+            <link href='https://fastly.jsdelivr.net/npm/@waline/client@v2/dist/waline.css' rel='stylesheet' />
+<script src='https://fastly.jsdelivr.net/npm/@waline/client@v2/dist/waline.js'></script>
+
+<style>
+	div#waline{
+		width:100%;
+		max-width: 1000px;
+		padding: 2.5%;
+	}
+	
+	span.katex { font-size: 20px; }
+	
+	.wl-emoji-popup { font-size: 16px !important; }
+	.wl-emoji-popup button { height: 2em; }
+</style>
+
+
+	<div id="waline"></div>
+
+<script>
+	Waline.init({
+		el: '#waline',
+		login: 'enable',
+		imageUploader: false,
+		search: false,
+		serverURL: 'https://waline-vercel.yjulm.com/',
+		pageSize: 10,
+		recordIp: true,
+		pageview: true,
+		commentSorting: 'hottest',
+		emoji: [
+				'//fastly.jsdelivr.net/npm/@waline/emojis/qq',
+				'//fastly.jsdelivr.net/npm/@waline/emojis/tw-emoji'
+		],
+		highlighter: function(code, lang) {
+			return hljs.highlight(code, {language: lang}).value;
+		},
+		texRenderer: function(blockMode, tex) {
+			var str = katex.renderToString(tex, {
+				displayMode: blockMode,
+				throwOnError: false,
+			});
+			return str;
+		}
+	});
+</script>
+
+        
+
+        <div class="site-footer gt-c-content-color-first">
+    <div class="slogan gt-c-content-color-first"></div>
+    <div class="social-container">
+        
+            
+                <a href="https://github.com/yjulm" target="_blank">
+                    <i class="fab fa-github gt-c-content-color-first"></i>
+                </a>
+            
+        
+            
+        
+            
+                <a href="https://weibo.com/yjulm" target="_blank">
+                    <i class="fab fa-weibo gt-c-content-color-first"></i>
+                </a>
+            
+        
+            
+                <a href="https://www.zhihu.com/people/yjulm" target="_blank">
+                    <i class="fab fa-zhihu gt-c-content-color-first"></i>
+                </a>
+            
+        
+            
+        
+            
+        
+    </div>
+    <div class="footer-info">
+        <div><p>平生知心者，屈指能有几。</p></div>
+    </div>
+    <div>
+        Theme by <a href="https://imhanjie.com/" target="_blank">imhanjie</a>, Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a>, <a href="https://yjulm.com/atom.xml" target="_blank">RSS</a>
+    </div>
+</div>
+
+        <script>
+  hljs.highlightAll();
+</script>
+
+        <script>
+(function() {
+	function addEventListener(element, type, handler) {
+        if (element.addEventListener) {
+            element.addEventListener(type, handler, false);
+        } else if (element.attachEvent) {
+            element.attachEvent('on' + type, handler);
+        }
+    }
+
+    addEventListener(window, 'load', function () {
+        var Viewer = window.Viewer;
+        var pictures = document.querySelector('.post-content');
+        var viewer = new Viewer(pictures);
+    });
+})();
+</script>
+
+
+        <script>
+            var ele = document.querySelector(".waline-pageview-count");
+            Object.defineProperty(ele, 'innerText', {
+                get: function() {
+                    return ele.innerText;
+                },
+                set: function(value) {
+                    ele.innerHTML = value;
+                    if (value > 0) {
+	                    var parent = document.querySelector(".leancloud_visitors");
+	                    parent.style.visibility="visible";
+	                }
+                }
+            });
+        </script>
+    </div>
+</div>
+</body>
+</html>

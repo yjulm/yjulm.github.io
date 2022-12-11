@@ -1,0 +1,375 @@
+<html lang="zh">
+<head>
+    <meta charset="utf-8" />
+<meta name="description" content="" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+<title>将最小化、隐藏、后台的窗口带到前台 | Yjulm</title>
+
+<link rel="shortcut icon" href="https://yjulm.com/favicon.ico?v=1670599107006">
+
+<link href="https://fastly.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://yjulm.com/styles/main.css">
+
+<!-- <link rel="stylesheet" href="https://fastly.jsdelivr.net/npm/bootstrap@4.5.0/dist/css/bootstrap.min.css"> -->
+<!-- <script src="https://fastly.jsdelivr.net/npm/moment@2.27.0/moment.min.js"></script> -->
+<!-- <script src="https://fastly.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js"></script> -->
+<!-- <script src="https://fastly.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"></script> -->
+<!-- <script src="https://fastly.jsdelivr.net/npm/bootstrap@4.5.0/dist/js/bootstrap.min.js"></script> -->
+<!-- DEMO JS -->
+<!--<script src="media/scripts/index.js"></script>-->
+
+
+
+    
+<link rel="stylesheet" href="https://fastly.jsdelivr.net/gh/highlightjs/cdn-release@11.3.1/build/styles/base16/solarized-light.min.css">
+
+<script src="https://fastly.jsdelivr.net/combine/gh/highlightjs/cdn-release@11.3.1/build/highlight.min.js,gh/highlightjs/cdn-release@11.3.1/build/languages/cpp.min.js,gh/highlightjs/cdn-release@11.3.1/build/languages/csharp.min.js,gh/highlightjs/cdn-release@11.3.1/build/languages/c.min.js,gh/highlightjs/cdn-release@11.3.1/build/languages/python.min.js,gh/highlightjs/cdn-release@11.3.1/build/languages/rust.min.js,gh/highlightjs/cdn-release@11.3.1/build/languages/xml.min.js,gh/highlightjs/cdn-release@11.3.1/build/languages/javascript.min.js,gh/highlightjs/cdn-release@11.3.1/build/languages/powershell.min.js,gh/highlightjs/cdn-release@11.3.1/build/languages/shell.min.js,gh/highlightjs/cdn-release@11.3.1/build/languages/sql.min.js,gh/highlightjs/cdn-release@11.3.1/build/languages/http.min.js,gh/highlightjs/cdn-release@11.3.1/build/languages/go.min.js,gh/highlightjs/cdn-release@11.3.1/build/languages/css.min.js"></script>
+
+<!-- <script src="https://fastly.jsdelivr.net/gh/highlightjs/cdn-release@11.3.1/build/highlight.min.js"></script>
+<script src="https://fastly.jsdelivr.net/gh/highlightjs/cdn-release@11.3.1/build/languages/cpp.min.js"></script>
+<script src="https://fastly.jsdelivr.net/gh/highlightjs/cdn-release@11.3.1/build/languages/csharp.min.js"></script>
+<script src="https://fastly.jsdelivr.net/gh/highlightjs/cdn-release@11.3.1/build/languages/c.min.js"></script>
+<script src="https://fastly.jsdelivr.net/gh/highlightjs/cdn-release@11.3.1/build/languages/python.min.js"></script>
+<script src="https://fastly.jsdelivr.net/gh/highlightjs/cdn-release@11.3.1/build/languages/rust.min.js"></script>
+<script src="https://fastly.jsdelivr.net/gh/highlightjs/cdn-release@11.3.1/build/languages/xml.min.js"></script>
+<script src="https://fastly.jsdelivr.net/gh/highlightjs/cdn-release@11.3.1/build/languages/javascript.min.js"></script>
+<script src="https://fastly.jsdelivr.net/gh/highlightjs/cdn-release@11.3.1/build/languages/powershell.min.js"></script>
+<script src="https://fastly.jsdelivr.net/gh/highlightjs/cdn-release@11.3.1/build/languages/shell.min.js"></script>
+<script src="https://fastly.jsdelivr.net/gh/highlightjs/cdn-release@11.3.1/build/languages/sql.min.js"></script>
+<script src="https://fastly.jsdelivr.net/gh/highlightjs/cdn-release@11.3.1/build/languages/http.min.js"></script>
+<script src="https://fastly.jsdelivr.net/gh/highlightjs/cdn-release@11.3.1/build/languages/go.min.js"></script>
+<script src="https://fastly.jsdelivr.net/gh/highlightjs/cdn-release@11.3.1/build/languages/css.min.js"></script>
+ -->
+
+    <script src="https://fastly.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+<script>mermaid.initialize({startOnLoad:true});</script>
+
+    <link rel="stylesheet" href="https://fastly.jsdelivr.net/npm/viewerjs@1.10.2/dist/viewer.min.css" />
+<script src="https://fastly.jsdelivr.net/npm/viewerjs@1.10.2/dist/viewer.min.js"></script>
+
+    <link rel="stylesheet" href="https://fastly.jsdelivr.net/npm/katex@0.16.4/dist/katex.min.css">
+    <script src="https://fastly.jsdelivr.net/npm/katex@0.16.4/dist/katex.min.js"></script>
+    <script src="https://fastly.jsdelivr.net/npm/katex@0.16.4/dist/contrib/auto-render.min.js"></script>
+</head>
+<body>
+<div class="main gt-bg-theme-color-first">
+    <nav class="navbar navbar-expand-lg">
+    <a class="navbar-brand" href="/">
+        <img class="user-avatar" src="/images/avatar.png" alt="头像">
+        <div class="site-name gt-c-content-color-first">
+            Yjulm
+        </div>
+    </a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+        aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation" id="changeNavbar">
+        <i class="fas fa-bars gt-c-content-color-first" style="font-size: 18px"></i>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <div class="navbar-nav mr-auto" style="text-align: center">
+            
+            <div class="nav-item">
+                
+                <a href="/" class="menu gt-a-link">
+                    首页
+                </a>
+                
+            </div>
+            
+            <div class="nav-item">
+                
+                <a href="/archives" class="menu gt-a-link">
+                    归档
+                </a>
+                
+            </div>
+            
+            <div class="nav-item">
+                
+                <a href="/tags" class="menu gt-a-link">
+                    标签
+                </a>
+                
+            </div>
+            
+            <div class="nav-item">
+                
+                <a href="/post/about" class="menu gt-a-link">
+                    关于
+                </a>
+                
+            </div>
+            
+        </div>
+        <div style="text-align: center">
+            <form id="gridea-search-form" style="position: relative" data-update="1670599107006"
+                action="/search/">
+                <input class="search-input" autocomplete="off" spellcheck="false" name="q" placeholder="搜索文章" />
+                <i class="fas fa-search gt-c-content-color-first" style="position: absolute; top: 9px; left: 10px;"></i>
+            </form>
+        </div>
+    </div>
+</nav>
+<script>
+    /* 移动端导航栏展开/收起切换 */
+    document.getElementById('changeNavbar').onclick = function () {
+        var element = document.getElementById('navbarSupportedContent');
+        if (element.style.display === 'none' || element.style.display === '') {
+            element.style.display = 'block';
+        } else {
+            element.style.display = 'none';
+        }
+    }
+</script>
+
+    <div class="post-container">
+        <div class="post-detail gt-bg-theme-color-second">
+            <article class="gt-post-content">
+                <h2 class="post-title">
+                    将最小化、隐藏、后台的窗口带到前台
+                </h2>
+                <div class="post-info">
+                    <time class="post-time gt-c-content-color-first">
+                        · 2021-11-17 ·
+                    </time>
+                    
+                        <a href="https://yjulm.com/tag/mfc/" class="post-tags">
+                            # MFC
+                        </a>
+                    
+                        <a href="https://yjulm.com/tag/wpf/" class="post-tags">
+                            # WPF
+                        </a>
+                    
+                        <a href="https://yjulm.com/tag/winform/" class="post-tags">
+                            # WinForm
+                        </a>
+                    
+                </div>
+                <div class="post-content">
+                    <p>  当我们在实际办公场景中，经常会出现打开一个文档后由于处理其他事情而最小化了文档窗口，或者当前窗口被其他窗口遮挡后一段时间，从而忘记了已经打开过原文档。此时重新打开这个文档，那么如何做到不创建新窗口而直接激活原来的文档窗口，这就是当前探讨的问题。</p>
+<h1 id="一-取得窗口句柄">一、 取得窗口句柄</h1>
+<p>  激活窗口的关键在于如何找到这个窗口，在Win系统中有提供如下可用的窗口函数。</p>
+<blockquote>
+<ul>
+<li>EnumDesktopWindows</li>
+<li>GetWindowText</li>
+</ul>
+</blockquote>
+<p>  首先我们通过 <strong><code>EnumDesktopWindows</code></strong> 枚举所有的桌面顶级窗口，该函数接受一个 <em><strong>WNDENUMPROC</strong></em> 函数指针，将枚举过程将委托给函数指针执行。该函数原型如下：</p>
+<pre><code class="language-c#">delegate bool WNDENUMPROC(IntPtr hWnd, IntPtr lParam);
+</code></pre>
+<p>  该原型中 <em><strong>hWnd</strong></em> 为枚举到窗口句柄， <em><strong>lParam</strong></em> 为承接 <strong><code>EnumDeskWindows</code></strong> 所传入的自定义数据。</p>
+<p>  要激活一个已经打开文档窗口，我们可以在窗口枚举过程中使用文档名称匹配窗口名称来<br>
+定位实际的文档窗口。<strong><code>EnumDesktopWindows</code></strong> 函数的原型如下：</p>
+<pre><code class="language-c#">bool EnumDesktopWindows([In()] IntPtr hDesktop, WNDENUMPROC lpfn, [In] IntPtr lParam);
+</code></pre>
+<p>  该枚举函数不直接返回枚举结果，基于 <em><strong>lParam</strong></em>  的指针参数类型，我们需要实现一个结构来承载数据的输入和输出：</p>
+<pre><code class="language-c#">IntPtr[] args = new[] {
+    Marshal.StringToHGlobalAnsi(name),
+    Marshal.AllocHGlobal(IntPtr.Size), 
+};
+</code></pre>
+<p>  我们以 <em><strong>name</strong></em> 作为窗口匹配名称并分配到非托管内存，紧接着在非托管内存再分配一个可容纳指针的内存块存储返回数据，我们将两块内存的指针构建一个新的指针数组并将其传递到 <strong><code>EnumDesktopWinddows</code></strong> 中来启动枚举操作。</p>
+<pre><code class="language-c#">GCHandle handle = GCHandle.Alloc(args, GCHandleType.Pinned);
+IntPtr argsPtr = handle.AddrOfPinnedObject(); 
+EnumDesktopWindows(IntPtr.Zero, _enumProc, argsPtr);
+</code></pre>
+<p>  为防止 <strong>GC</strong> 移动对象扰乱 <strong>PInvoke</strong> 的交互操作，需要将此指针数组固定在内存中。枚举工作正式启动，下面调用栈来到 <em><strong>WNDENUMPROC</strong></em> 的枚举回调中：</p>
+<pre><code class="language-c#">IntPtr namePtr = Marshal.ReadIntPtr(lParam);
+IntPtr writePtr = Marshal.ReadIntPtr(IntPtr.Add(lParam, IntPtr.Size)); //数组的第二个元素
+string findName = Marshal.PtrToStringAnsi(namePtr);
+</code></pre>
+<p>  在枚举过程中通过传入数据的 <em><strong>lParam</strong></em> 分别在 <strong>GC</strong> 固定对象的内存处，取得我们需要的窗口匹配名称字符串指针以及匹配完成的输出内存指针。</p>
+<pre><code class="language-c#">string wndTitle = new string(new char[MAX_PATH]);
+GetWindowText(hWnd, wndTitle, MAX_PATH - 1);
+if (wndTitle.Contains(findName))
+    Marshal.WriteIntPtr(writePtr, hWnd);
+</code></pre>
+<p>  基于 <strong><code>GetWindowText</code></strong> 取得当前枚举窗口的窗口名称，并与 <em><strong>wndTitle</strong></em> 对比即可找到对应的窗口。将找到的窗口指针写回到GC固定内存的第二个位置，就完成了数据回传，通过直接使用指针数组的第二元素即可访问该回传窗口指针。</p>
+<h1 id="二-激活窗口到前台">二、 激活窗口到前台</h1>
+<p>  激活一个窗口到前台，可能遇到的情况有这么几种。</p>
+<ul>
+<li>窗口处于Normal，但处于非激活的后台窗口</li>
+<li>窗口已被Minimize，此时激活窗口必须先还原状态</li>
+<li>窗口已被Hide，此时激活窗口必须先对窗口完成Show</li>
+</ul>
+<p>  实现以上这些操作则需要用到如下接口函数：</p>
+<blockquote>
+<ul>
+<li>GetWindowThreadProcessId</li>
+<li>GetCurrentThreadId</li>
+<li>AttachThreadInput</li>
+<li>IsIconic</li>
+<li>ShowWindow</li>
+<li>SetActiveWindow</li>
+<li>SetWindowPos</li>
+<li>SetForegroundWindow</li>
+<li>SetFocus</li>
+</ul>
+</blockquote>
+<p>  要完成以上的这些操作，有一个前提是完成这些操作的线程必须是创建窗口的线程。显然该文档窗口由打开文档的程序自己线程创建，无法达到这一要求。基于此的原因是Windows系统设计中，每一个 <strong>Thread</strong> 有自己的 <strong>MessageQueue</strong>。这也是无论基于<strong>MFC、WinForms、WPF</strong>设计的窗体程序，这些窗体都有自己的一个 <strong>WndProc</strong> 消息循环函数。要在一个线程中操作另一个线程创建的窗口，此时就需要借助 <strong><code>AttachThreadInput</code></strong> 来连接两个线程的消息队列。</p>
+<pre><code class="language-c#">uint procId = Win32.GetWindowThreadProcessId(hWnd, IntPtr.Zero);
+uint thrId = Win32.GetCurrentThreadId();
+AttachThreadInput(procId, thrId, true);
+</code></pre>
+<p>  我们首先借助 <strong><code>GetWindowThreadProcessId</code></strong> 通过窗口句柄 <em><strong>hWnd</strong></em> 来取得窗口的线程，然后使用 <strong><code>GetCurrentThreadId</code></strong> 取得当前线程，使用两个线程ID完成最后连接。</p>
+<pre><code class="language-c#">if (IsIconic(hWnd)
+    ShowWindow(hWnd, SW_RESTORE);
+else
+    ShowWindow(hWnd, SW_SHOW));
+</code></pre>
+<p>  完成连接后，使用 <strong><code>IsIconic</code></strong> 检测窗口的显示状态是否已最小化，如果是的话则对其还原显示状态，否则强制完成 <strong>Show</strong>，用作处理窗口被 <strong>Hide</strong> 的情况。</p>
+<pre><code class="language-c#">SetActiveWindow(hWnd);
+SetWindowPos(hWnd, HWND_TOPMOS, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW);
+SetWindowPos(hWnd, HWND_NOTOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW);
+SetForegroundWindow(hWnd);
+SetFocus(hWnd);
+AttachThreadInput(procId, thrId, false);
+</code></pre>
+<p>  使用 <strong><code>SetActiveWindow</code></strong> 将其窗口激活，再通过 <strong><code>SetWindowPos</code></strong> 交错使用参数 <strong><code>HWND_TOPMOS</code></strong> 和 <strong><code>HWND_NOTOPMOST</code></strong> 将窗口置顶后还原，来将其窗口带到其他窗口的上层显示。</p>
+<p>  借助 <strong><code>SetForegroundWindow</code></strong> 设置窗口为前台窗口，并使用 <strong><code>SetFocus</code></strong> 给予窗口键盘焦点。最后分离两个线程完成整个操作。</p>
+
+                </div>
+            </article>
+        </div>
+
+        
+
+        
+            <div id="/post/activate-minimized-hidden-background-windows/" class="leancloud_visitors" style="visibility:collapse" data-flag-title="将最小化、隐藏、后台的窗口带到前台">
+            	当前文章阅读量为 <span id="/post/activate-minimized-hidden-background-windows/" class="waline-pageview-count leancloud-visitors-count">0</span> 次
+            </div>
+        
+
+        
+
+        
+            <link href='https://fastly.jsdelivr.net/npm/@waline/client@v2/dist/waline.css' rel='stylesheet' />
+<script src='https://fastly.jsdelivr.net/npm/@waline/client@v2/dist/waline.js'></script>
+
+<style>
+	div#waline{
+		width:100%;
+		max-width: 1000px;
+		padding: 2.5%;
+	}
+	
+	span.katex { font-size: 20px; }
+	
+	.wl-emoji-popup { font-size: 16px !important; }
+	.wl-emoji-popup button { height: 2em; }
+</style>
+
+
+	<div id="waline"></div>
+
+<script>
+	Waline.init({
+		el: '#waline',
+		login: 'enable',
+		imageUploader: false,
+		search: false,
+		serverURL: 'https://waline-vercel.yjulm.com/',
+		pageSize: 10,
+		recordIp: true,
+		pageview: true,
+		commentSorting: 'hottest',
+		emoji: [
+				'//fastly.jsdelivr.net/npm/@waline/emojis/qq',
+				'//fastly.jsdelivr.net/npm/@waline/emojis/tw-emoji'
+		],
+		highlighter: function(code, lang) {
+			return hljs.highlight(code, {language: lang}).value;
+		},
+		texRenderer: function(blockMode, tex) {
+			var str = katex.renderToString(tex, {
+				displayMode: blockMode,
+				throwOnError: false,
+			});
+			return str;
+		}
+	});
+</script>
+
+        
+
+        <div class="site-footer gt-c-content-color-first">
+    <div class="slogan gt-c-content-color-first"></div>
+    <div class="social-container">
+        
+            
+                <a href="https://github.com/yjulm" target="_blank">
+                    <i class="fab fa-github gt-c-content-color-first"></i>
+                </a>
+            
+        
+            
+        
+            
+                <a href="https://weibo.com/yjulm" target="_blank">
+                    <i class="fab fa-weibo gt-c-content-color-first"></i>
+                </a>
+            
+        
+            
+                <a href="https://www.zhihu.com/people/yjulm" target="_blank">
+                    <i class="fab fa-zhihu gt-c-content-color-first"></i>
+                </a>
+            
+        
+            
+        
+            
+        
+    </div>
+    <div class="footer-info">
+        <div><p>平生知心者，屈指能有几。</p></div>
+    </div>
+    <div>
+        Theme by <a href="https://imhanjie.com/" target="_blank">imhanjie</a>, Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a>, <a href="https://yjulm.com/atom.xml" target="_blank">RSS</a>
+    </div>
+</div>
+
+        <script>
+  hljs.highlightAll();
+</script>
+
+        <script>
+(function() {
+	function addEventListener(element, type, handler) {
+        if (element.addEventListener) {
+            element.addEventListener(type, handler, false);
+        } else if (element.attachEvent) {
+            element.attachEvent('on' + type, handler);
+        }
+    }
+
+    addEventListener(window, 'load', function () {
+        var Viewer = window.Viewer;
+        var pictures = document.querySelector('.post-content');
+        var viewer = new Viewer(pictures);
+    });
+})();
+</script>
+
+
+        <script>
+            var ele = document.querySelector(".waline-pageview-count");
+            Object.defineProperty(ele, 'innerText', {
+                get: function() {
+                    return ele.innerText;
+                },
+                set: function(value) {
+                    ele.innerHTML = value;
+                    if (value > 0) {
+	                    var parent = document.querySelector(".leancloud_visitors");
+	                    parent.style.visibility="visible";
+	                }
+                }
+            });
+        </script>
+    </div>
+</div>
+</body>
+</html>
